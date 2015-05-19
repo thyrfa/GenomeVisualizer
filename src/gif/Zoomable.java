@@ -17,66 +17,63 @@ import javax.swing.SwingUtilities;
 @SuppressWarnings("serial")
 public class Zoomable extends JPanel implements Runnable {
 
-AffineTransform tx = new AffineTransform();
+	AffineTransform tx = new AffineTransform();
 
-Rectangle2D.Double rect1 = new Rectangle2D.Double(100, 100, 30, 60);
-Rectangle2D.Double rect2 = new Rectangle2D.Double(150, 250, 60, 40);
+	Rectangle2D.Double rect1 = new Rectangle2D.Double(100, 100, 30, 60);
+	Rectangle2D.Double rect2 = new Rectangle2D.Double(150, 250, 60, 40);
 
-public Zoomable() {
-this.addMouseWheelListener(new ZoomHandler());
-}
+	public Zoomable() {
+		this.addMouseWheelListener(new ZoomHandler());
+	}
 
-@Override
-public void paint(Graphics g) {
-super.paint(g);
-Graphics2D g2 = (Graphics2D) g;
-g2.setColor(Color.RED);
-g2.draw(tx.createTransformedShape(rect1));
-g2.setColor(Color.BLUE);
-g2.draw(tx.createTransformedShape(rect2));
-}
+	@Override
+	public void paint(Graphics g) {
+		super.paint(g);
+		Graphics2D g2 = (Graphics2D) g;
+		g2.setColor(Color.RED);
+		g2.draw(tx.createTransformedShape(rect1));
+		g2.setColor(Color.BLUE);
+		g2.draw(tx.createTransformedShape(rect2));
+	}	
 
-private class ZoomHandler implements MouseWheelListener {
+	private class ZoomHandler implements MouseWheelListener {
 
-double scale = 1.0;
+		double scale = 1.0;
 
-public void mouseWheelMoved(MouseWheelEvent e) {
-if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
+		public void mouseWheelMoved(MouseWheelEvent e) {
+			if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
+				Point2D p1 = e.getPoint();
+				Point2D p2 = null;
+				try {
+					p2 = tx.inverseTransform(p1, null);
+				} catch (NoninvertibleTransformException ex) {
+					// should not get here
+					ex.printStackTrace();
+					return;
+				}
+				scale -= (0.1 * e.getWheelRotation());
+				scale = Math.max(0.1, scale);
 
-Point2D p1 = e.getPoint();
-Point2D p2 = null;
-try {
-p2 = tx.inverseTransform(p1, null);
-} catch (NoninvertibleTransformException ex) {
-// should not get here
-ex.printStackTrace();
-return;
-}
+				tx.setToIdentity();
+				tx.translate(p1.getX(), p1.getY());
+				tx.scale(scale, scale);
+				tx.translate(-p2.getX(), -p2.getY());
 
-scale -= (0.1 * e.getWheelRotation());
-scale = Math.max(0.1, scale);
+				Zoomable.this.revalidate();
+				Zoomable.this.repaint();
+			}
+		}
+	}
+	public void run() {
+		JFrame f = new JFrame("Zoom Demo");
+		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		f.getContentPane().add(this);
+		f.setSize(600, 600);
+		f.setLocationRelativeTo(null);
+		f.setVisible(true);
+	}	
 
-tx.setToIdentity();
-tx.translate(p1.getX(), p1.getY());
-tx.scale(scale, scale);
-tx.translate(-p2.getX(), -p2.getY());
-
-Zoomable.this.revalidate();
-Zoomable.this.repaint();
-}
-}
-}
-
-public void run() {
-JFrame f = new JFrame("Zoom Demo");
-f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-f.getContentPane().add(this);
-f.setSize(600, 600);
-f.setLocationRelativeTo(null);
-f.setVisible(true);
-}
-
-public static void main(String[] args) {
-SwingUtilities.invokeLater(new Zoomable());
-}
+	public static void main(String[] args) {
+		new Zoomable().run();
+	}
 }

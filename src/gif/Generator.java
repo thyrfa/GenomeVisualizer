@@ -249,7 +249,7 @@ public class Generator implements ActionListener {
 		boolean inlast=false;
 		boolean ranone=false;
 		boolean rantwo=false;
-		boolean ranthree=false;
+		counter=1;
 		try{
 			FileReader ist = new FileReader(f);
 			BufferedReader in = new BufferedReader(ist);
@@ -300,6 +300,7 @@ public class Generator implements ActionListener {
 						total+=n;
 						counter++;
 						list.add(new ColorCounter(n, ch, total));
+						System.out.println(counter);
 					}
 					s= new StringBuilder();
 					ch=(char)c;
@@ -413,7 +414,7 @@ public class Generator implements ActionListener {
 				}
 			}
 			else{
-			for (int n=0; n<sqrt+1; n++){
+			for (int n=0; n<sqrt; n++){
 				c= colors.get(list.get(q).getCharacter());
 				if (list.get(q).getNumber()==max){
 					k=kone;
@@ -662,6 +663,7 @@ public class Generator implements ActionListener {
 		  g = fileChooser.getSelectedFile();
 		}
 		saveloc = g;
+		saver = g;
 		a=f;
 		panel=new JFrame();
 		panel.setLayout(new GridBagLayout());
@@ -860,7 +862,7 @@ public class Generator implements ActionListener {
 			vert=-1;
 			panel.dispose();
 			if (uncompressed){
-				new TotalGenerator(saveloc, fileprefix, dimensions()).readList(a, -1);
+				new TotalGenerator(saveloc, fileprefix, dimensions(a)).readList(a, -1);
 
 			}
 			else{
@@ -875,7 +877,7 @@ public class Generator implements ActionListener {
 			vert=0;
 			panel.dispose();
 			if (uncompressed){
-				new TotalGenerator(saveloc, fileprefix, dimensions()).readList(a, 1);
+				new TotalGenerator(saveloc, fileprefix, dimensions(a)).readList(a, 1);
 			}
 			else{
 				panel=new JFrame();
@@ -887,41 +889,49 @@ public class Generator implements ActionListener {
 		}
 		
 	}
-	public int[] dimensions(){
-		sqrt=(int) Math.sqrt(list.size());
-		squarewidth=(int)(width/sqrt);
-		sqrt=(int)(sqrt+((width-(squarewidth*sqrt))/squarewidth));
-		squareheight=(int)(height/Math.ceil(list.size() / (double)sqrt));
-		if (squarewidth<=0 ||squareheight<=0){
-			squarewidth=1;
-			squareheight=1;
-			sqrt=(int) Math.sqrt(list.size());
-		}
-		if (!xsize.getText().equals("")&&!ysize.getText().equals("")){
-			boolean cat=false;
-			try{
-				squarewidth=Integer.parseInt(xsize.getText());
-				squareheight=Integer.parseInt(ysize.getText());
-				sqrt=(int) Math.sqrt(list.size());
-
+	public int[] dimensions(File f){
+		try{
+			FileReader ist = new FileReader(f.getParentFile()+fileprefix+f.getName().substring(0, f.getName().indexOf("."))+".counter");
+			BufferedReader in = new BufferedReader(ist);
+			String s = in.readLine();
+			int listsize = Integer.parseInt(s.substring(s.indexOf("to")+3));
+			sqrt=(int) Math.sqrt(listsize);
+			squarewidth=(int)(width/sqrt);
+			sqrt=(int)(sqrt+((width-(squarewidth*sqrt))/squarewidth));
+			squareheight=(int)(height/Math.ceil(listsize / (double)sqrt));
+			if (squarewidth<=0 ||squareheight<=0){
+				squarewidth=1;
+				squareheight=1;
+				sqrt=(int) Math.sqrt(listsize);
 			}
-			catch(Exception e){
-				cat=true;
+			if (!xsize.getText().equals("")&&!ysize.getText().equals("")){
+				boolean cat=false;
+				try{
+					squarewidth=Integer.parseInt(xsize.getText());
+					squareheight=Integer.parseInt(ysize.getText());
+					sqrt=(int) Math.sqrt(listsize);
+					
+				}
+				catch(Exception e){
+					cat=true;
+				}
+				if (cat){
+					squarewidth=(int)(width/sqrt);
+					sqrt=(int)(sqrt+((width-(squarewidth*sqrt))/squarewidth));
+					squareheight=(int)(height/Math.ceil(listsize / (double)sqrt));
+				}
 			}
-			if (cat){
-				squarewidth=(int)(width/sqrt);
-				sqrt=(int)(sqrt+((width-(squarewidth*sqrt))/squarewidth));
-				squareheight=(int)(height/Math.ceil(list.size() / (double)sqrt));
+			if (((int)Math.ceil(listsize / sqrt)+1)*squareheight>height){
+				sqrt=(int)Math.floor(width/squarewidth);
 			}
-		}
-		if (((int)Math.ceil(list.size() / sqrt)+1)*squareheight>height){
-			sqrt=(int)Math.floor(width/squarewidth);
-		}
-		if (!imglngth.getText().equals("")){
-			try{
-				sqrt = Integer.parseInt(imglngth.getText())/squarewidth;
-			}catch(Exception e){}
-		}
+			if (!imglngth.getText().equals("")){
+				try{
+					sqrt = Integer.parseInt(imglngth.getText())/squarewidth;
+				}catch(Exception e){}
+			}
+			in.close();
+			ist.close();
+		}catch(Exception e){}
 		return new int[]{squarewidth, squareheight, sqrt};
 	}
 	//Mouse event for a compressed single pair frame

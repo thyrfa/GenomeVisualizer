@@ -9,12 +9,9 @@ import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -48,8 +45,6 @@ public class TotalGenerator {
 	JTextField gcolor;
 	int sqrt;
 	int numchars;
-	JTextField xsize;
-	JTextField ysize;
 	int squareheight;
 	int squarewidth;
 	boolean pair=false;
@@ -63,7 +58,7 @@ public class TotalGenerator {
 	int counter;
 	File saver;
 	
-	public TotalGenerator(File save, String pre, JTextField xs, JTextField ys) {
+	public TotalGenerator(File save, String pre, int[] dim) {
 		fileprefix = pre;
 		colors.put('a', Color.red.darker());
 		colors.put('g', Color.green.darker());
@@ -75,8 +70,9 @@ public class TotalGenerator {
 		basetobase.put('t', "Thymine");
 		basetobase.put('n', "Unknown");
 		basetobase.put('c', "Cytosine");
-		xsize=xs;
-		ysize=ys;
+		squarewidth = dim[0];
+		squareheight = dim[1];
+		sqrt = dim[2];
 		saver=save;
 	}
 	public void readList(File f, int q){
@@ -188,44 +184,12 @@ public class TotalGenerator {
 		//System.out.println(ysize.getText());
 		panel=new JFrame("Horizontal");
 		panel.setLayout(new BorderLayout());
-		sqrt=(int) Math.sqrt(numchars);
-		//System.out.println(list.toString());
-		squarewidth=(int)(width/sqrt);
-		sqrt=(int)(sqrt+((width-(squarewidth*sqrt))/squarewidth));
-		squareheight=(int)(height/Math.ceil(list.size() / (double)sqrt));
-		if (squarewidth<=0 ||squareheight<=0){
-			squarewidth=1;
-			squareheight=1;
-			sqrt=(int) Math.sqrt(list.size());
-		}
-
-		if (!xsize.getText().equals("")&&!ysize.getText().equals("")){
-			boolean cat=false;
-			try{
-				squarewidth=Integer.parseInt(xsize.getText());
-				squareheight=Integer.parseInt(ysize.getText());
-				sqrt=(int) Math.sqrt(list.size());
-			}
-			catch(Exception e){
-				e.printStackTrace();
-				cat=true;
-			}
-			if (cat){
-				squarewidth=(int)(width/sqrt);
-				sqrt=(int)(sqrt+((width-(squarewidth*sqrt))/squarewidth));
-				squareheight=(int)(height/Math.ceil(list.size() / (double)sqrt));
-			}
-		}
-		if (((int)Math.ceil(list.size() / sqrt)+1)*squareheight>height){
-			sqrt=(int)Math.floor(width/squarewidth);
-		}
 		int k=0;
 		int lastindex=list.size()-1;
 		image = new BufferedImage(sqrt*squarewidth, (int)(squareheight*Math.ceil(lastindex/(double)sqrt)), BufferedImage.TYPE_INT_RGB);
 		dim= new Dimension(image.getWidth(), image.getHeight());
 		Color c;
-		Graphics g = image.getGraphics(); 
-		char ch;
+		Graphics g = image.getGraphics();
 		int listindex=0;
 		for (int i=0; k<lastindex;i++){
 			if (lastindex-k<=lastindex%sqrt){
@@ -265,7 +229,7 @@ public class TotalGenerator {
 		panel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		JLabel imagelabel=new JLabel(new ImageIcon(image));
 		//zoom.add(imagelabel);
-		scroll = new JScrollPane (zoom, 
+		scroll = new JScrollPane (imagelabel, 
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scroll.addMouseListener(new MouseWatcher(this));
 		//System.out.println(scroll.getSize());
@@ -289,43 +253,6 @@ public class TotalGenerator {
 		panel.setLayout(new BorderLayout());
 		//System.out.println(xsize.getText());
 		//System.out.println(ysize.getText());
-		sqrt=(int) Math.sqrt(list.size());
-		//System.out.println(list.toString());
-		squarewidth=(int)(width/sqrt);
-		sqrt=(int)(sqrt+((width-(squarewidth*sqrt))/squarewidth));
-		squareheight=(int)(height/Math.ceil(list.size() / (double)sqrt));
-		if (squarewidth<=0 ||squareheight<=0){
-			squarewidth=1;
-			squareheight=1;
-			sqrt=(int) Math.sqrt(list.size());
-		}
-		/*System.out.println(height);
-		System.out.println(width);
-		System.out.println(squarewidth);
-		System.out.println(squareheight);
-		System.out.println(sqrt);
-		System.out.println(list.size()%sqrt);*/
-		System.out.println(list.size());
-		if (!xsize.getText().equals("")&&!ysize.getText().equals("")){
-			boolean cat=false;
-			try{
-				squarewidth=Integer.parseInt(xsize.getText());
-				squareheight=Integer.parseInt(ysize.getText());
-				sqrt=(int) Math.sqrt(list.size());
-
-			}
-			catch(Exception e){
-				cat=true;
-			}
-			if (cat){
-				squarewidth=(int)(width/sqrt);
-				sqrt=(int)(sqrt+((width-(squarewidth*sqrt))/squarewidth));
-				squareheight=(int)(height/Math.ceil(list.size() / (double)sqrt));
-			}
-		}
-		if (((int)Math.ceil(list.size() / sqrt)+1)*squareheight>height){
-			sqrt=(int)Math.floor(width/squarewidth);
-		}
 		int k=0;
 		int listindex=0;
 		int lastindex=list.size()-1;
@@ -483,15 +410,6 @@ public class TotalGenerator {
 					shower.show(e.getComponent(), x+xdif-h.x, y+ydif-h.y);
 				}
 			}
-		}
-		//vertical tooltip
-		else{
-			if (xcol*sqrt+yrow<list.size()){
-				shower.add(new JLabel("Base is "+basetobase.get(list.get(xcol*sqrt+yrow))));
-				shower.add(new JLabel("Position: "+(xcol*sqrt+yrow)));
-				shower.show(e.getComponent(), x+xdif-h.x, y+ydif-h.y);
-			}
-		}
-		
+		}		
 	}
 }

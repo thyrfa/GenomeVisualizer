@@ -79,6 +79,7 @@ public class Generator implements ActionListener {
 	int ksix=4;
 	boolean uncompressed=false;
 	File saveloc;
+	JTextField imglngth;
 	static HashMap<Character, Color> colorstat= new HashMap<Character, Color>();
     static {
 		colorstat.put('a', Color.red);
@@ -286,22 +287,20 @@ public class Generator implements ActionListener {
 						s=new StringBuilder();
 						rantwo=true;
 					}
-					else if (dots==3&&!ranthree){
+					/*else if (dots==3&&!ranthree){
 						//System.out.println("s:"+s.toString());
 						counter=Integer.parseInt(s.toString());
 						s=new StringBuilder();
 						ranthree=true;
-					}
+					}*/
 				}
 				else if ((char)c!=ch&&(char)c!='0'&&ch!='@'){
 					n=Integer.parseInt(s.toString().replace(ch, '1'), 2);
-					//System.out.println(s.toString().replace(ch, '1'));
-					//System.out.println(n);
-					total+=n;
-					counter++;
-					//System.out.println(ch+", "+n);
-					//System.out.println(total);
-					list.add(new ColorCounter(n, ch, total));
+					for(int z = 0; z < Math.ceil(n/5); z++){
+						total+=n;
+						counter++;
+						list.add(new ColorCounter(n, ch, total));
+					}
 					s= new StringBuilder();
 					ch=(char)c;
 					s.append((char)c);
@@ -336,9 +335,6 @@ public class Generator implements ActionListener {
 		else if (t==-1){
 			makeSnakeImage();
 		}
-		else{
-			makeVertImage();
-		}
 	}
 	//horizontal left to right image creator
 	public void makeImage(){
@@ -354,13 +350,6 @@ public class Generator implements ActionListener {
 			squareheight=1;
 			sqrt=(int) Math.sqrt(list.size());
 		}
-		/*System.out.println(height);
-		System.out.println(width);
-		System.out.println(squarewidth);
-		System.out.println(squareheight);
-		System.out.println(sqrt);
-		System.out.println(list.size());
-		System.out.println(list.size()%sqrt);*/
 		if (!xsize.getText().equals("")&&!ysize.getText().equals("")){
 			boolean cat=false;
 			try{
@@ -487,191 +476,7 @@ public class Generator implements ActionListener {
 		 e.printStackTrace(); 
 		}
 	}
-	public void makeVertImage(){
-		sqrt=(int) Math.sqrt(list.size());
-		//System.out.println(list.toString());	
-		squareheight=(int)(height/sqrt);
-		sqrt=(int)(sqrt+((height-(squareheight*sqrt))/(double)squareheight));
-		squarewidth=(int)(width/Math.ceil(list.size() / (double)sqrt));
-		if (squarewidth<=0 ||squareheight<=0){
-			squarewidth=1;
-			squareheight=1;
-			sqrt=(int) Math.sqrt(list.size());
-		}
-		/*System.out.println(height);
-		System.out.println(width);
-		System.out.println(squarewidth);
-		System.out.println(squareheight);
-		System.out.println(sqrt);
-		System.out.println(list.size());
-		System.out.println(list.size()%sqrt);*/
-		if (!xsize.getText().equals("")&&!ysize.getText().equals("")){
-			boolean cat=false;
-			try{
-				squarewidth=Integer.parseInt(xsize.getText());
-				squareheight=Integer.parseInt(ysize.getText());
-				sqrt=(int) Math.sqrt(list.size());
-
-			}
-			catch(Exception e){
-				cat=true;
-			}
-			if (cat){
-				squarewidth=(int)(width/sqrt);
-				sqrt=(int)(sqrt+((width-(squarewidth*sqrt))/squarewidth));
-				squareheight=(int)(height/Math.ceil(list.size() / (double)sqrt));
-			}
-		}
-		if (((int)Math.ceil(list.size() / sqrt)+1)*squareheight>height){
-			sqrt=(int)Math.floor(width/squarewidth);
-		}
-		image = new BufferedImage((int)(squarewidth*Math.ceil(list.size()/(double)sqrt)), sqrt*squareheight, BufferedImage.TYPE_INT_RGB);
-		dim= new Dimension(image.getWidth(), image.getHeight());
-		Color c;
-		Graphics g = image.getGraphics(); 
-		int k;
-		int p=0;
-		for (int i=0; i<(int)Math.ceil(list.size() / sqrt)+1;i++){
-			if (i==Math.ceil(list.size()/sqrt)){
-				for (int n=0; n<list.size()%sqrt; n++){
-					/*System.out.println("number: "+(i*sqrt)+n);
-					System.out.println("i: "+i);
-					System.out.println("n: "+n);
-					System.out.println(height);
-					System.out.println("width: "+width);
-					System.out.println(squareheight);
-					System.out.println(squarewidth);*/
-					//System.out.println(Math.ceil(list.size()/20.0));
-					c= colors.get(list.get(p).getCharacter());
-					//System.out.println(c);
-					//System.out.println(list.get((i*sqrt)+n).getCharacter());
-					if (list.get(p).getNumber()==max){
-						k=kone;
-					}
-					else if (list.get(p).getNumber()>((max-modenum)/2)+modenum){
-						k=ktwo;
-					}
-					else if(list.get(p).getNumber()>modenum){
-						k=kthree;
-					}
-					else if (list.get(p).getNumber()==modenum){
-						k=kfour;
-					}
-					else if (list.get(p).getNumber()==1){
-						k=ksix;
-					}
-					else{
-						k=kfive;
-					}
-					for (int q=0; q<k;q++){
-						c=c.darker();
-					}
-					p++;
-					//System.out.println(c);
-					g.setColor(c);
-					g.fillRect(i*squarewidth, (n*squareheight), squarewidth, squareheight);
-					g.setColor(Color.black);
-				}
-			}
-			else{
-			for (int n=0; n<sqrt+1; n++){
-				//System.out.println((i*20)+n);
-				//System.out.println(Math.ceil(list.size()/20.0));
-				c= colors.get(list.get((i*sqrt)+n).getCharacter());
-				if(i==0&&n==0){
-					System.out.println(c);
-					System.out.println(list.get(0).getCharacter());
-				}
-				//System.out.println(c);
-				//System.out.println(list.get((i*20)+n).getCharacter());
-				if (list.get(p).getNumber()==max){
-					k=kone;
-				}
-				else if (list.get(p).getNumber()>((max-modenum)/2)+modenum){
-					k=ktwo;
-				}
-				else if(list.get(p).getNumber()>modenum){
-					k=kthree;
-				}
-				else if (list.get(p).getNumber()==modenum){
-					k=kfour;
-				}
-				else if (list.get(p).getNumber()==1){
-					k=ksix;
-				}
-				else{
-					k=kfive;
-				}
-				for (int q=0; q<k;q++){
-					c=c.darker();
-				}
-				p++;
-				//System.out.println(c);
-				g.setColor(c);
-				g.fillRect(i*squarewidth, (n*squareheight), squarewidth, squareheight);
-				g.setColor(Color.black);
-				
-			}
-			}
-			if (squarewidth>2){
-				g.fillRect(i*squarewidth, 0, 1, squareheight*sqrt);
-			}
-			if (squareheight>2){
-				g.fillRect(0, i*squareheight, squarewidth*sqrt, 1);
-			}
-		}
-		g.setColor(Color.black);
-		g.fillRect((int)width-1, 0, 1, (int)height);
-		panel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		JLabel imagelabel=new JLabel(new ImageIcon(image));
-		scroll = new JScrollPane (imagelabel,  
-      		   JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		scroll.addMouseListener(new MouseWatcher(this));
-		panel.getContentPane().add(scroll);
-		JLabel label=new JLabel("Number of bases represented: "+numchars+"  Number of squares on screen: "+list.size()+"   Compression ratio: "+Generator.round((((float)numchars)/list.size()),2)+":1");
-		panel.add(label, BorderLayout.PAGE_END);
-		panel.pack();
-		labx=label.getSize().width;
-		laby=label.getSize().height;
-		panel.setExtendedState(JFrame.MAXIMIZED_BOTH);
- 		panel.setVisible(true);
-		try {  
-			ImageIO.write(image, "gif", saver); 
-			
-		} catch (IOException e) {  
-		 e.printStackTrace(); 
-		}
-	}
 	public void makeSnakeImage(){
-		sqrt=(int) Math.sqrt(list.size());
-		squarewidth=(int)(width/sqrt);
-		sqrt=(int)(sqrt+((width-(squarewidth*sqrt))/squarewidth));
-		squareheight=(int)(height/Math.ceil(list.size() / (double)sqrt));
-		if (squarewidth<=0 ||squareheight<=0){
-			squarewidth=1;
-			squareheight=1;
-			sqrt=(int) Math.sqrt(list.size());
-		}
-		if (!xsize.getText().equals("")&&!ysize.getText().equals("")){
-			boolean cat=false;
-			try{
-				squarewidth=Integer.parseInt(xsize.getText());
-				squareheight=Integer.parseInt(ysize.getText());
-				sqrt=(int) Math.sqrt(list.size());
-
-			}
-			catch(Exception e){
-				cat=true;
-			}
-			if (cat){
-				squarewidth=(int)(width/sqrt);
-				sqrt=(int)(sqrt+((width-(squarewidth*sqrt))/squarewidth));
-				squareheight=(int)(height/Math.ceil(list.size() / (double)sqrt));
-			}
-		}
-		if (((int)Math.ceil(list.size() / sqrt)+1)*squareheight>height){
-			sqrt=(int)Math.floor(width/squarewidth);
-		}
 		image = new BufferedImage(sqrt*squarewidth, (int)(squareheight*Math.ceil(list.size()/(double)sqrt)), BufferedImage.TYPE_INT_RGB);
 		dim= new Dimension(image.getWidth(), image.getHeight());
 		Color c;
@@ -863,9 +668,6 @@ public class Generator implements ActionListener {
 		GridBagConstraints c= new GridBagConstraints();
 		panel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		JLabel question=new JLabel("What type of generation would you like?");
-		JButton game=new JButton("Vertical");
-		game.setActionCommand("vert");
-		game.addActionListener(this);
 		JButton make=new JButton("Horizontal");
 		JButton snake= new JButton("Snaked Horizontal");
 		snake.setActionCommand("snake");
@@ -875,23 +677,26 @@ public class Generator implements ActionListener {
 		JButton colorz= new JButton("Customize Colors");
 		colorz.setActionCommand("colors");
 		colorz.addActionListener(this);
-		c.gridy=7;
+		c.gridy=8;
 		c.gridx=1;
 		panel.add(new JLabel("    "), c);
 		c.gridy++;
 		panel.add(colorz, c);
 		c.gridy=4;
 		c.gridx=1;
+		panel.add(new JLabel("Length of image in pixels? (Blank for default)"), c);
+		c.gridy++;
+		imglngth = new JTextField(6);
+		panel.add(imglngth, c);
+		c.gridy++;
 		panel.add(question, c);
 		c.gridx++;
-		c.gridy=5;
-		panel.add(new JLabel("    "), c);
 		c.gridy=6;
-		panel.add(game, c);
+		panel.add(new JLabel("    "), c);
+		c.gridy=7;
+		panel.add(snake, c);
 		c.gridx=0;
 		panel.add(make, c);
-		c.gridx=1;
-		panel.add(snake, c);
 		c.gridy=0;
 		c.gridx=0;
 		panel.add(new JLabel("X"), c);
@@ -908,26 +713,20 @@ public class Generator implements ActionListener {
 		panel.add(ysize, c);
 		c.gridy=2;
 		c.gridx=1;
-		panel.add(new JLabel("Would you like to represent base pairs or single bases?"), c);
+		panel.add(new JLabel("Would you like compressed or uncompressed bases?"), c);
 		c.gridx=0;
 		c.gridy=3;
 	    ButtonGroup bG = new ButtonGroup();
-		JRadioButton single= new JRadioButton("Single bases");
+		JRadioButton single= new JRadioButton("Compressed");
 		bG.add(single);
-		JRadioButton pair= new JRadioButton("Base pairs");
-		bG.add(pair);
-		JRadioButton uncompress= new JRadioButton("Uncompressed single bases");
+		JRadioButton uncompress= new JRadioButton("Uncompressed");
 		uncompress.addActionListener(this);
 		uncompress.setActionCommand("uncompress");
 		bG.add(uncompress);
 		single.addActionListener(this);
-		pair.addActionListener(this);
 		single.setActionCommand("sing");
-		pair.setActionCommand("pair");
 		panel.add(single, c);
 		c.gridx=2;
-		panel.add(pair, c);
-		c.gridx--;
 		panel.add(uncompress, c);
 		panel.pack();
 		panel.setVisible(true);
@@ -1010,22 +809,8 @@ public class Generator implements ActionListener {
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		//render vertically
-		if (e.getActionCommand().equals("vert")){
-			vert=1;
-			panel.dispose();
-			if (!pair){
-				panel=new JFrame();
-				panel.setLayout(new BorderLayout());
-				readList(a);
-				display(1);
-			}
-			else{
-			new PairGenerator(xsize, ysize).makeList(a, -1);
-			}
-		}
 		//load color selection
-		else if (e.getActionCommand().equals("colors")){
+		if (e.getActionCommand().equals("colors")){
 			pickColors();
 		}
 		else if (e.getActionCommand().equals("uncompress")){
@@ -1070,22 +855,12 @@ public class Generator implements ActionListener {
 				pickColors();
 			}
 		}
-		//whether pair is selected
-		else if(e.getActionCommand().equals("pair")){
-			pair=true;
-		}
-		else if(e.getActionCommand().equals("sing")){
-			pair=false;
-		}
 		//render in snake
 		else if(e.getActionCommand().equals("snake")){
 			vert=-1;
 			panel.dispose();
-			if (pair){
-				new PairGenerator(xsize, ysize).makeList(a, -1);
-			}
-			else if (uncompressed){
-				new TotalGenerator(saveloc, fileprefix, xsize, ysize).readList(a, -1);
+			if (uncompressed){
+				new TotalGenerator(saveloc, fileprefix, dimensions()).readList(a, -1);
 
 			}
 			else{
@@ -1099,11 +874,8 @@ public class Generator implements ActionListener {
 		else if(e.getActionCommand().equals("horiz")){
 			vert=0;
 			panel.dispose();
-			if (pair){
-				new PairGenerator(xsize, ysize).makeList(a, 1);
-			}
-			else if (uncompressed){
-				new TotalGenerator(saveloc, fileprefix, xsize, ysize).readList(a, 1);
+			if (uncompressed){
+				new TotalGenerator(saveloc, fileprefix, dimensions()).readList(a, 1);
 			}
 			else{
 				panel=new JFrame();
@@ -1114,6 +886,43 @@ public class Generator implements ActionListener {
 			
 		}
 		
+	}
+	public int[] dimensions(){
+		sqrt=(int) Math.sqrt(list.size());
+		squarewidth=(int)(width/sqrt);
+		sqrt=(int)(sqrt+((width-(squarewidth*sqrt))/squarewidth));
+		squareheight=(int)(height/Math.ceil(list.size() / (double)sqrt));
+		if (squarewidth<=0 ||squareheight<=0){
+			squarewidth=1;
+			squareheight=1;
+			sqrt=(int) Math.sqrt(list.size());
+		}
+		if (!xsize.getText().equals("")&&!ysize.getText().equals("")){
+			boolean cat=false;
+			try{
+				squarewidth=Integer.parseInt(xsize.getText());
+				squareheight=Integer.parseInt(ysize.getText());
+				sqrt=(int) Math.sqrt(list.size());
+
+			}
+			catch(Exception e){
+				cat=true;
+			}
+			if (cat){
+				squarewidth=(int)(width/sqrt);
+				sqrt=(int)(sqrt+((width-(squarewidth*sqrt))/squarewidth));
+				squareheight=(int)(height/Math.ceil(list.size() / (double)sqrt));
+			}
+		}
+		if (((int)Math.ceil(list.size() / sqrt)+1)*squareheight>height){
+			sqrt=(int)Math.floor(width/squarewidth);
+		}
+		if (!imglngth.getText().equals("")){
+			try{
+				sqrt = Integer.parseInt(imglngth.getText())/squarewidth;
+			}catch(Exception e){}
+		}
+		return new int[]{squarewidth, squareheight, sqrt};
 	}
 	//Mouse event for a compressed single pair frame
 	public void mouseClicked(MouseEvent e){
@@ -1176,16 +985,6 @@ public class Generator implements ActionListener {
 				}
 			}
 		}
-		//vertical tooltip
-		else{
-			if (xcol*sqrt+yrow<list.size()){
-				shower.add(new JLabel("Base is "+basetobase.get(list.get(xcol*sqrt+yrow).getCharacter())));
-				shower.add(new JLabel("Amount represented: "+list.get(xcol*sqrt+yrow).getNumber()));
-				shower.add(new JLabel("Position: "+list.get(xcol*sqrt+yrow).getIndex()));
-				shower.show(e.getComponent(), x+xdif-h.x, y+ydif-h.y);
-			}
-		}
-		
 	}
 	public static void main(String[] args) {
 		String fileprefix = "";

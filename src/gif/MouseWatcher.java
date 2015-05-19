@@ -5,23 +5,16 @@ import java.awt.event.MouseListener;
 
 public class MouseWatcher implements MouseListener {
 	Generator g;
-	PairGenerator p;
 	TotalGenerator t;
 	public MouseWatcher(Generator gs){
 		g=gs;
-	}
-	public MouseWatcher(PairGenerator ps){
-		p=ps;
 	}
 	public MouseWatcher(TotalGenerator ts){
 		t=ts;
 	}
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		if (g==null&&t==null){
-			p.mouseClicked(e);
-		}
-		else if (t==null&&p==null){
+		if (t==null){
 			g.mouseClicked(e);
 		}
 		else{

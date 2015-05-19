@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -21,11 +22,15 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.JViewport;
 
+//Generate uncompressed singles
 public class TotalGenerator {
 	public HashMap<Character, Color> colors=new HashMap<Character, Color>();
+	public final String fileprefix;
 	JFrame frame;
 	public int max=0;
 	public int modenum=0;
@@ -34,6 +39,7 @@ public class TotalGenerator {
 	public File a;
 	public HashMap<Character, String> basetobase= new HashMap<Character, String>();
 	JFrame panel;
+	Zoomable zoom = new Zoomable();
 	double width;
 	double height;
 	JTextField acolor;
@@ -47,7 +53,7 @@ public class TotalGenerator {
 	int squareheight;
 	int squarewidth;
 	boolean pair=false;
-	ArrayList<ColorCounter> list;
+	ArrayList<Character> list;
 	JScrollPane scroll;
 	int vert=0;
 	int labx;
@@ -57,7 +63,8 @@ public class TotalGenerator {
 	int counter;
 	File saver;
 	
-	public TotalGenerator(JTextField xs, JTextField ys) {
+	public TotalGenerator(File save, String pre, JTextField xs, JTextField ys) {
+		fileprefix = pre;
 		colors.put('a', Color.red.darker());
 		colors.put('g', Color.green.darker());
 		colors.put('c', Color.blue.darker());
@@ -70,23 +77,15 @@ public class TotalGenerator {
 		basetobase.put('c', "Cytosine");
 		xsize=xs;
 		ysize=ys;
-		File f=new File("C:/Users/"+System.getProperty("user.name")+"/Desktop/NewGeneImage.gif");
-		int i=0;
-		while (f.exists()){
-			f=new File("C:/Users/"+System.getProperty("user.name")+"/Desktop/NewGeneImage"+i+".gif");
-			i++;
-		}
-		saver=f;
+		saver=save;
 	}
 	public void readList(File f, int q){
-		//System.out.println("Hi"+Runtime.getRuntime().maxMemory());
 		try{
 			saver.createNewFile();
 		}
 		catch(Exception e){
 			e.printStackTrace();
 		}
-		list=new ArrayList<ColorCounter>();
 		boolean t=true;
 		StringBuilder s=new StringBuilder();
 		int c;
@@ -99,45 +98,44 @@ public class TotalGenerator {
 		boolean rantwo=false;
 		boolean ranthree=false;
 		try{
+			FileReader countz = new FileReader(new File(f.getParentFile().getAbsolutePath()+fileprefix+f.getName().substring(0, f.getName().indexOf("."))+".counter"));
+			BufferedReader cin = new BufferedReader(countz);
+			String counts = cin.readLine();
+			int num = Integer.parseInt(counts.substring(counts.indexOf("to")+3));
+			cin.close();
+			countz.close();
+			list = new ArrayList<Character>(num);
 			FileReader ist = new FileReader(f);
 			BufferedReader in = new BufferedReader(ist);
 			while(t==true){
-				//System.out.println(Runtime.getRuntime().freeMemory());
 				c=in.read();
-				//System.out.println((char)c);
 				if (ch=='z'){
 					inlast=true;
 					s=new StringBuilder();
 				}
-				//System.out.println("Dots: "+dots);
 				if (c==-1){
 					numchars=Integer.parseInt(s.toString());
 					t=false;
 				}
 				else if (inlast){
-					//System.out.println((char)c);
 					ch='@';
 					if ((char)c=='z'){
 						dots++;
 					}
 					else{
 						s.append((char)c);
-						//System.out.println(s.toString());
 					}
 					if (dots==1&&!ranone){
-						//System.out.println("s:"+s.toString());
 						max=Integer.parseInt(s.toString());
 						s=new StringBuilder();
 						ranone=true;
 					}
 					else if (dots==2&&!rantwo){
-						//System.out.println("s:"+s.toString());
 						modenum=Integer.parseInt(s.toString());
 						s=new StringBuilder();
 						rantwo=true;
 					}
 					else if (dots==3&&!ranthree){
-						//System.out.println("s:"+s.toString());
 						counter=Integer.parseInt(s.toString());
 						s=new StringBuilder();
 						ranthree=true;
@@ -145,17 +143,14 @@ public class TotalGenerator {
 				}
 				else if ((char)c!=ch&&(char)c!='0'&&ch!='@'){
 					n=Integer.parseInt(s.toString().replace(ch, '1'), 2);
-					//System.out.println(s.toString().replace(ch, '1'));
-					//System.out.println(n);
 					if (n>20000){
 						n=20000;
 					}
 					total+=n;
 					counter++;
-					//System.out.println(total);
-					//System.out.println(ch+", "+n);
-					//System.out.println(total);
-					list.add(new ColorCounter(n, ch, total));
+					for (int z = 0; z<n; z++){
+						list.add(ch);
+					}
 					s= new StringBuilder();
 					ch=(char)c;
 					s.append((char)c);
@@ -170,7 +165,6 @@ public class TotalGenerator {
 			}
 			in.close();
 			ist.close();
-			//list.trimToSize();
 		}
 		catch(Throwable e){
 			e.printStackTrace();
@@ -225,71 +219,41 @@ public class TotalGenerator {
 		if (((int)Math.ceil(list.size() / sqrt)+1)*squareheight>height){
 			sqrt=(int)Math.floor(width/squarewidth);
 		}
-		/*System.out.println(height);
-		System.out.println(width);
-		System.out.println(squarewidth);
-		System.out.println(squareheight);
-		System.out.println(sqrt);
-		System.out.println(list.size());
-		System.out.println(list.size()%sqrt);*/
 		int k=0;
-		int listindex=0;
-		int[] indexer= new int[list.size()];
-		for (int i=0; i<list.size(); i++){
-			indexer[i]=list.get(i).getIndex();
-		}
-		int lastindex=indexer[indexer.length-1];
+		int lastindex=list.size()-1;
 		image = new BufferedImage(sqrt*squarewidth, (int)(squareheight*Math.ceil(lastindex/(double)sqrt)), BufferedImage.TYPE_INT_RGB);
 		dim= new Dimension(image.getWidth(), image.getHeight());
 		Color c;
 		Graphics g = image.getGraphics(); 
 		char ch;
-		for (int i=0; k<indexer[indexer.length-1];i++){
+		int listindex=0;
+		for (int i=0; k<lastindex;i++){
 			if (lastindex-k<=lastindex%sqrt){
 				for (int n=0; k<lastindex; n++){
-					//System.out.println((i*sqrt)+n);
-					//System.out.println(Math.ceil(list.size()/20.0));
-					//System.out.println(k);
-					c= colors.get(list.get(listindex).getCharacter());
+					c= colors.get(list.get(listindex));
 					k++;
-					//System.out.println(k);
-					//System.out.println(listindex);
-					//System.out.println(indexer[listindex]);
-					//System.out.println(c);
-					//System.out.println(list.get((i*sqrt)+n).getCharacter());
-					//System.out.println(c);
 					g.setColor(c);
 					g.fillRect((n*squarewidth), i*squareheight, squarewidth, squareheight);
 					g.setColor(Color.black);
 					if (squarewidth>1){
 						g.fillRect((n*squarewidth), i*squareheight, 1, squareheight);
 					}
-					if (k>=indexer[listindex]){
-						listindex++;
-					}
+					listindex++;
 				}
 
 			}
 			else{
-			for (int n=0; n<sqrt; n++){
-				//System.out.println(Math.ceil(list.size()/20.0));
-				c= colors.get(list.get(listindex).getCharacter());
-				k++;
-				//System.out.println(k);
-				//System.out.println(listindex);
-				//System.out.println(indexer[listindex]);
-				//System.out.println(list.get((i*20)+n).getCharacter());
-				//System.out.println(c);
-				g.setColor(c);
-				g.fillRect((n*squarewidth), i*squareheight, squarewidth, squareheight);
-				g.setColor(Color.black);
-				if (squarewidth>1){
-					g.fillRect((n*squarewidth), i*squareheight, 1, squareheight);
-				}
-				if (k>=indexer[listindex]){
+				for (int n=0; n<sqrt; n++){
+					c= colors.get(list.get(listindex));
+					k++;
+					g.setColor(c);
+					g.fillRect((n*squarewidth), i*squareheight, squarewidth, squareheight);
+					g.setColor(Color.black);
+					if (squarewidth>1){
+						g.fillRect((n*squarewidth), i*squareheight, 1, squareheight);
+					}
 					listindex++;
 				}
-			}
 			}
 			if (squareheight>1){
 				g.fillRect(0, i*squareheight, squarewidth*sqrt, 1);
@@ -300,7 +264,8 @@ public class TotalGenerator {
 		g.fillRect((int)width-1, 0, 1, (int)height);
 		panel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		JLabel imagelabel=new JLabel(new ImageIcon(image));
-		scroll = new JScrollPane (imagelabel, 
+		//zoom.add(imagelabel);
+		scroll = new JScrollPane (zoom, 
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scroll.addMouseListener(new MouseWatcher(this));
 		//System.out.println(scroll.getSize());
@@ -363,29 +328,18 @@ public class TotalGenerator {
 		}
 		int k=0;
 		int listindex=0;
-		int[] indexer= new int[list.size()];
-		for (int i=0; i<list.size(); i++){
-			indexer[i]=list.get(i).getIndex();
-		}
-		int lastindex=indexer[indexer.length-1];
+		int lastindex=list.size()-1;
 		image = new BufferedImage(sqrt*squarewidth, (int)(squareheight*Math.ceil(lastindex/(double)sqrt)), BufferedImage.TYPE_INT_RGB);
 		dim= new Dimension(image.getWidth(), image.getHeight());
 		Color c;
 		Graphics g = image.getGraphics(); 
 		for (int i=0; k<lastindex-1;i++){
 			g.setColor(Color.black);
-			/*System.out.println(sqrt);
-			System.out.println(lastindex);
-			System.out.println(list.size());
-			System.out.println(list.get(list.size()-1).getIndex());
-			System.out.println("l-k: "+(lastindex-k));
-			System.out.println("l%k: "+(lastindex%sqrt));
-			System.out.println("l/s: "+(lastindex/sqrt));*/
 			if (lastindex-k<=sqrt&&Math.ceil(lastindex/sqrt)%2==0){
 				for (int n=0; k<lastindex; n++){
 					//System.out.println((i*sqrt)+n);
 					//System.out.println(Math.ceil(list.size()/20.0));
-					c= colors.get(list.get(listindex).getCharacter());
+					c= colors.get(list.get(listindex));
 					k++;
 					//System.out.println(c);
 					//System.out.println(list.get((i*sqrt)+n).getCharacter());
@@ -393,9 +347,7 @@ public class TotalGenerator {
 					g.setColor(c);
 					g.fillRect((n*squarewidth), i*squareheight, squarewidth, squareheight);
 					g.setColor(Color.black);
-					if (k>=indexer[listindex]&&listindex!=indexer.length-1){
-						listindex++;
-					}
+					listindex++;
 					if (squarewidth>1){
 						g.fillRect((n*squarewidth)-squarewidth, i*squareheight, 1, squareheight);
 					}
@@ -403,45 +355,28 @@ public class TotalGenerator {
 			}
 			else if (lastindex-k<=sqrt&&Math.ceil(lastindex/sqrt)%2==1){
 				for (int n=(lastindex%sqrt); k<lastindex; n--){
-					//System.out.println((i*sqrt)+n);
-					//System.out.println(Math.ceil(list.size()/20.0));
-					/*System.out.println(lastindex);
-					System.out.println(listindex);
-					System.out.println(list.size());
-					System.out.println(sqrt);
-					System.out.println(lastindex%sqrt);*/
-					c= colors.get(list.get(listindex).getCharacter());
+					c= colors.get(list.get(listindex));
 					k++;
-					//System.out.println(c);
-					//System.out.println(list.get((i*sqrt)+n).getCharacter());
-					//System.out.println(c);
 					g.setColor(c);
 					g.fillRect((n*squarewidth)-squarewidth, i*squareheight, squarewidth, squareheight);
 					g.setColor(Color.black);
 					if (squarewidth>1){
 						g.fillRect((n*squarewidth)-squarewidth, i*squareheight, 1, squareheight);
 					}
-					if (k>=indexer[listindex]&&listindex!=indexer.length-1){
-						listindex++;
-					}
+					listindex++;
 				}
 			}
 			else if(i%2==0){
 			//System.out.println(i);
 			for (int n=0; n<sqrt; n++){
-				//System.out.println(Math.ceil(list.size()/20.0));
-				//System.out.println("k: "+k);
-				//System.out.println("listindex: "+listindex);
-				c= colors.get(list.get(listindex).getCharacter());
+				c= colors.get(list.get(listindex));
 				k++;
 				//System.out.println(list.get((i*20)+n).getCharacter());
 				//System.out.println(c);
 				g.setColor(c);
 				g.fillRect((n*squarewidth), i*squareheight, squarewidth, squareheight);
 				g.setColor(Color.black);
-				if (k>=indexer[listindex]){
-					listindex++;
-				}
+				listindex++;
 				if (squarewidth>1){
 					g.fillRect((n*squarewidth), i*squareheight, 1, squareheight);
 				}
@@ -451,7 +386,7 @@ public class TotalGenerator {
 				//System.out.println(i);
 				for (int n=sqrt-1; n>-1; n--){
 					//System.out.println(Math.ceil(list.size()/20.0));
-					c= colors.get(list.get(listindex).getCharacter());
+					c= colors.get(list.get(listindex));
 					k++;
 					//System.out.println(list.get((i*20)+n).getCharacter());
 					//System.out.println(c);
@@ -461,9 +396,7 @@ public class TotalGenerator {
 					if (squarewidth>1){
 						g.fillRect((n*squarewidth), i*squareheight, 1, squareheight);
 					}
-					if (k>=indexer[listindex]){
-						listindex++;
-					}
+					listindex++;
 				}
 			}
 			if (squareheight>1){
@@ -495,6 +428,70 @@ public class TotalGenerator {
 		}
 	}
 	public void mouseClicked(MouseEvent e){
+		JPopupMenu shower=new JPopupMenu();
+		JViewport viewport = scroll.getViewport();
+		int xdif=viewport.getSize().width-dim.width;
+		int ydif=viewport.getSize().height-dim.height;
+		xdif=xdif/2;
+		ydif=ydif/2; //ydif and xdif are the difference in location between the edge of the scrollframe and the picture, can find what pixel of the IMAGE was clicked on.
+		if (xdif<0){
+			xdif=0;
+		}
+		if (ydif<0){
+			ydif=0;
+		}
+        Point h=viewport.getViewPosition();
+        //h is how much the user has scrolled, corrects for that.
+		int x=e.getX()+h.x-xdif;
+		int y=e.getY()+h.y-ydif;
+		int yrow=(int) Math.floor(y/(double)squareheight);
+		int xcol=(int) Math.floor(x/(double)squarewidth);
+		if (yrow<0||xcol<0){
+			return;
+		}
+		//regular horizontal tooltip
+		if (vert==0){
+			System.out.println(squareheight+", "+squarewidth);
+			System.out.println(x+", "+y+"||"+xcol+", "+yrow);
+			if (yrow*sqrt+xcol<list.size()){
+				shower.add(new JLabel("Base is "+basetobase.get(list.get(yrow*sqrt+xcol))));
+				shower.add(new JLabel("Position: "+(yrow*sqrt+xcol)));
+				shower.show(e.getComponent(), x+xdif-h.x, y+ydif-h.y);
+			}
+		}
+		//snaked tooltip
+		else if (vert==-1){
+			//clicker if last line is odd
+			if ((int)Math.floor(dim.height/(double)squareheight)==yrow && yrow%2==1){
+				shower.add(new JLabel("Base is "+basetobase.get(list.get((yrow*list.size()%sqrt+(list.size()%sqrt-xcol))-1))));
+				shower.add(new JLabel("Position: "+((yrow*list.size()%sqrt+(list.size()%sqrt-xcol))-1)));
+				shower.add(new JLabel("Going Left"));
+				shower.show(e.getComponent(), x+xdif-h.x, y+ydif-h.y);
+			}
+			//clicker for everything else
+			else if (yrow*sqrt+xcol<list.size()){
+				if (yrow%2==1){
+					shower.add(new JLabel("Base is "+basetobase.get(list.get((yrow*sqrt+(sqrt-xcol))-1))));
+					shower.add(new JLabel("Position: "+((yrow*sqrt+(sqrt-xcol))-1)));
+					shower.add(new JLabel("Going left"));
+					shower.show(e.getComponent(), x+xdif-h.x, y+ydif-h.y);
+				}
+				else{
+					shower.add(new JLabel("Base is "+basetobase.get(list.get(yrow*sqrt+xcol))));
+					shower.add(new JLabel("Position: "+(yrow*sqrt+xcol)));
+					shower.add(new JLabel("Going right"));
+					shower.show(e.getComponent(), x+xdif-h.x, y+ydif-h.y);
+				}
+			}
+		}
+		//vertical tooltip
+		else{
+			if (xcol*sqrt+yrow<list.size()){
+				shower.add(new JLabel("Base is "+basetobase.get(list.get(xcol*sqrt+yrow))));
+				shower.add(new JLabel("Position: "+(xcol*sqrt+yrow)));
+				shower.show(e.getComponent(), x+xdif-h.x, y+ydif-h.y);
+			}
+		}
 		
 	}
 }

@@ -40,6 +40,7 @@ import javax.swing.JViewport;
 import javax.swing.filechooser.FileNameExtensionFilter;
 public class Generator implements ActionListener {
 	public HashMap<Character, Color> colors=new HashMap<Character, Color>();
+	public final String fileprefix;
 	JFrame frame;
 	public int max=0;
 	public int modenum=0;
@@ -77,6 +78,7 @@ public class Generator implements ActionListener {
 	int kfive=3;
 	int ksix=4;
 	boolean uncompressed=false;
+	File saveloc;
 	static HashMap<Character, Color> colorstat= new HashMap<Character, Color>();
     static {
 		colorstat.put('a', Color.red);
@@ -97,7 +99,8 @@ public class Generator implements ActionListener {
       * //DONE-----Fix base numbers 
       * //DONE-----Bring back image writing 
       * //Option to represent purely with numbers*/
-	public Generator(){
+	public Generator(String pre){
+		fileprefix = pre;
 		colors.put('a', Color.red);
 		colors.put('g', Color.green);
 		colors.put('c', Color.blue);
@@ -108,11 +111,11 @@ public class Generator implements ActionListener {
 		basetobase.put('t', "Thymine");
 		basetobase.put('n', "Unknown");
 		basetobase.put('c', "Cytosine");
-		File f=new File("C:/Users/"+System.getProperty("user.name")+"/Desktop/NewGeneImage.gif");
+		File f=new File("C:/Users/"+System.getProperty("user.name")+fileprefix+"Desktop"+fileprefix+"NewGeneImage.gif");
 		//finds place to write image
 		int i=0;
 		while (f.exists()){
-			f=new File("C:/Users/"+System.getProperty("user.name")+"/Desktop/NewGeneImage"+i+".gif");
+			f=new File("C:/Users/"+System.getProperty("user.name")+fileprefix+"Desktop"+fileprefix+"NewGeneImage"+i+".gif");
 			i++;
 		}
 		saver=f;
@@ -123,7 +126,8 @@ public class Generator implements ActionListener {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		width = screenSize.getWidth();
 		height = screenSize.getHeight();
-		File one=new File(f.getParentFile().getAbsolutePath()+"\\"+f.getName().substring(0, f.getName().indexOf("."))+".cfa");
+		File one=new File(f.getParentFile().getAbsolutePath()+fileprefix+f.getName().substring(0, f.getName().indexOf("."))+".cfa");
+		System.out.println(one.toString());
 		char lastchar='y';
 		int count=1;
 		list= new ArrayList<ColorCounter>();
@@ -203,7 +207,7 @@ public class Generator implements ActionListener {
 				FileWriter writeone= new FileWriter(one, true);
 				PrintWriter writerone= new PrintWriter(new BufferedWriter(writeone));
 				System.out.println(writeone.getEncoding());
-				File two=new File(f.getParentFile().getAbsolutePath()+"\\"+f.getName().substring(0, f.getName().indexOf("."))+".counter");
+				File two=new File(f.getParentFile().getAbsolutePath()+fileprefix+f.getName().substring(0, f.getName().indexOf("."))+".counter");
 				System.out.println('z'+max+'z'+modenum+"z"+counter+"z"+numchars);
 				writerone.write("z"+max+"z"+modenum+"z"+counter+"z"+numchars);
 				writerone.flush();
@@ -847,6 +851,12 @@ public class Generator implements ActionListener {
 	}
 	//The menu to determine what kind of generation the user wants--Color selection does NOT work for uncompressed or pairs, vertical doesnt work with uncompressed
 	public void ask(File f){
+		File g = new File(fileprefix);
+		JFileChooser fileChooser = new JFileChooser();
+		if (fileChooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
+		  g = fileChooser.getSelectedFile();
+		}
+		saveloc = g;
 		a=f;
 		panel=new JFrame();
 		panel.setLayout(new GridBagLayout());
@@ -1075,7 +1085,7 @@ public class Generator implements ActionListener {
 				new PairGenerator(xsize, ysize).makeList(a, -1);
 			}
 			else if (uncompressed){
-				new TotalGenerator(xsize, ysize).readList(a, -1);
+				new TotalGenerator(saveloc, fileprefix, xsize, ysize).readList(a, -1);
 
 			}
 			else{
@@ -1093,7 +1103,7 @@ public class Generator implements ActionListener {
 				new PairGenerator(xsize, ysize).makeList(a, 1);
 			}
 			else if (uncompressed){
-				new TotalGenerator(xsize, ysize).readList(a, 1);
+				new TotalGenerator(saveloc, fileprefix, xsize, ysize).readList(a, 1);
 			}
 			else{
 				panel=new JFrame();
@@ -1178,6 +1188,13 @@ public class Generator implements ActionListener {
 		
 	}
 	public static void main(String[] args) {
+		String fileprefix = "";
+		if (System.getProperty("os.name").toString().equals("Linux")){
+			fileprefix = "/";
+		}
+		else{
+			fileprefix = "\\";
+		}
 		JFrame panel= new JFrame();
 		JFileChooser fc = new JFileChooser(new File("C:\\Users\\"+System.getProperty("user.name")+"\\Downloads"));
 	    FileNameExtensionFilter filter = new FileNameExtensionFilter(
@@ -1191,7 +1208,8 @@ public class Generator implements ActionListener {
 	    if(returnVal == JFileChooser.APPROVE_OPTION){
 	    	panel.dispose();
 	    	f=fc.getSelectedFile();
-	    	Generator g=new Generator();
+	    	System.out.println(f.toString());
+	    	Generator g=new Generator(fileprefix);
 	    	if (f.getParentFile().isDirectory()){
 	    		for (File i : f.getParentFile().listFiles()){
 	    			if ((f.getName().substring(0, f.getName().indexOf("."))+".cfa").equals(i.getName())){

@@ -16,11 +16,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JViewport;
 
@@ -49,7 +47,6 @@ public class TotalGenerator {
 	int squarewidth;
 	boolean pair=false;
 	ArrayList<Character> list;
-	JScrollPane scroll;
 	int vert=0;
 	int labx;
 	int laby;
@@ -57,6 +54,7 @@ public class TotalGenerator {
 	BufferedImage image;
 	int counter;
 	File saver;
+	ZoomPanel zPanel;
 	
 	public TotalGenerator(File save, String pre, int[] dim) {
 		fileprefix = pre;
@@ -228,26 +226,17 @@ public class TotalGenerator {
 		g.setColor(Color.black);
 		g.fillRect((int)width-1, 0, 1, (int)height);
 		panel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		JLabel imagelabel=new JLabel(new ImageIcon(image));
-		//zoom.add(imagelabel);
-		scroll = new JScrollPane (imagelabel, 
-				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		scroll.addMouseListener(new MouseWatcher(this));
-		//System.out.println(scroll.getSize());
-		panel.getContentPane().add(scroll);
-		g.dispose();
-		panel.pack();
-		panel.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		//System.out.println(scroll.getSize());
-		//System.out.println(label.getSize());
-		//System.out.println(panel.getContentPane().getSize());
-		panel.setVisible(true);
 		try {  
 			ImageIO.write(image, "gif", saver); 
 			
 		} catch (IOException e) {  
 		 e.printStackTrace(); 
 		}
+		panel.dispose();
+		zPanel = new ZoomPanel(new MouseWatcher(this), image);
+		//System.out.println(scroll.getSize());
+		g.dispose();
+
 	}
 	public void makeSnakeImage(){
 		panel=new JFrame("Snake");
@@ -335,29 +324,20 @@ public class TotalGenerator {
 		g.setColor(Color.black);
 		g.fillRect((int)width-1, 0, 1, (int)height);
 		panel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		JLabel imagelabel=new JLabel(new ImageIcon(image));
-		scroll = new JScrollPane (imagelabel, 
-				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		scroll.addMouseListener(new MouseWatcher(this));
-		g.dispose();
-		//System.out.println(scroll.getSize());
-		panel.getContentPane().add(scroll);
-		panel.pack();
-		panel.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		//System.out.println(scroll.getSize());
-		//System.out.println(label.getSize());
-		//System.out.println(panel.getContentPane().getSize());
-		panel.setVisible(true);
 		try {  
 			ImageIO.write(image, "gif", saver); 
 			
-		} catch (IOException e) { 
+		} catch (IOException e) {  
 		 e.printStackTrace(); 
 		}
+		panel.dispose();
+		zPanel = new ZoomPanel(new MouseWatcher(this), image);
+		//System.out.println(scroll.getSize());
+		g.dispose();
 	}
 	public void mouseClicked(MouseEvent e){
 		JPopupMenu shower=new JPopupMenu();
-		JViewport viewport = scroll.getViewport();
+		JViewport viewport = zPanel.scroll.getViewport();
 		int xdif=viewport.getSize().width-dim.width;
 		int ydif=viewport.getSize().height-dim.height;
 		xdif=xdif/2;
@@ -368,12 +348,14 @@ public class TotalGenerator {
 		if (ydif<0){
 			ydif=0;
 		}
-        Point h=viewport.getViewPosition();
+        Point h=viewport.getViewPosition();        
+        xdif+=2;
+        ydif+=2;
         //h is how much the user has scrolled, corrects for that.
 		int x=e.getX()+h.x-xdif;
 		int y=e.getY()+h.y-ydif;
-		int yrow=(int) Math.floor(y/(double)squareheight);
-		int xcol=(int) Math.floor(x/(double)squarewidth);
+		int yrow=(int) Math.floor(y/(zPanel.panel.scale*squareheight));
+		int xcol=(int) Math.floor(x/(zPanel.panel.scale*squarewidth));
 		if (yrow<0||xcol<0){
 			return;
 		}

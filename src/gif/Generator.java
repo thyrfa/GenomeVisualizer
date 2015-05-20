@@ -34,7 +34,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JViewport;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -64,7 +63,6 @@ public class Generator implements ActionListener {
 	int squarewidth;
 	boolean pair=false;
 	ArrayList<ColorCounter> list;
-	JScrollPane scroll;
 	int vert=0;
 	int labx;
 	int laby;
@@ -80,6 +78,7 @@ public class Generator implements ActionListener {
 	boolean uncompressed=false;
 	File saveloc;
 	JTextField imglngth;
+	ZoomPanel zPanel;
 	static HashMap<Character, Color> colorstat= new HashMap<Character, Color>();
     static {
 		colorstat.put('a', Color.red);
@@ -454,25 +453,19 @@ public class Generator implements ActionListener {
 		g.fillRect((int)width-1, 0, 1, (int)height);
 		//the jframe is set up here
 		panel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		JLabel imagelabel=new JLabel(new ImageIcon(image));
-		scroll = new JScrollPane (imagelabel, 
-				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		scroll.addMouseListener(new MouseWatcher(this));
-		panel.getContentPane().add(scroll);
-		g.dispose();
-		JLabel label=new JLabel("Number of bases represented: "+numchars+"  Number of squares on screen: "+list.size()+"   Compression ratio: "+Generator.round((((float)numchars)/list.size()),2)+":1");
-		panel.add(label, BorderLayout.PAGE_END);
-		panel.pack();
-		panel.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		labx=label.getSize().width;
-		laby=label.getSize().height;
-		panel.setVisible(true);
 		try {  
 			ImageIO.write(image, "gif", saver); 
 			
 		} catch (IOException e) {  
 		 e.printStackTrace(); 
 		}
+		panel.dispose();
+		zPanel = new ZoomPanel(new MouseWatcher(this), image);
+		//System.out.println(scroll.getSize());
+		g.dispose();
+		//System.out.println(scroll.getSize());
+		//System.out.println(label.getSize());
+		//System.out.println(panel.getContentPane().getSize());
 	}
 	public void makeSnakeImage(){
 		image = new BufferedImage(sqrt*squarewidth, (int)(squareheight*Math.ceil(list.size()/(double)sqrt)), BufferedImage.TYPE_INT_RGB);
@@ -632,25 +625,19 @@ public class Generator implements ActionListener {
 		g.setColor(Color.black);
 		g.fillRect((int)width-1, 0, 1, (int)height);
 		panel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		JLabel imagelabel=new JLabel(new ImageIcon(image));
-		scroll = new JScrollPane (imagelabel, 
-				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		scroll.addMouseListener(new MouseWatcher(this));
-		g.dispose();
-		panel.getContentPane().add(scroll);
-		JLabel label=new JLabel("Number of bases represented: "+numchars+"  Number of squares on screen: "+list.size()+"   Compression ratio: "+Generator.round((((float)numchars)/list.size()),2)+":1");
-		panel.add(label, BorderLayout.PAGE_END);
-		panel.pack();
-		panel.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		labx=label.getSize().width;
-		laby=label.getSize().height;
-		panel.setVisible(true);
 		try {  
 			ImageIO.write(image, "gif", saver); 
 			
-		} catch (IOException e) { 
+		} catch (IOException e) {  
 		 e.printStackTrace(); 
 		}
+		panel.dispose();
+		zPanel = new ZoomPanel(new MouseWatcher(this), image);
+		//System.out.println(scroll.getSize());
+		g.dispose();
+		//System.out.println(scroll.getSize());
+		//System.out.println(label.getSize());
+		//System.out.println(panel.getContentPane().getSize());
 	}
 	//The menu to determine what kind of generation the user wants--Color selection does NOT work for uncompressed or pairs, vertical doesnt work with uncompressed
 	public void ask(File f){
@@ -942,7 +929,7 @@ public class Generator implements ActionListener {
 	public void mouseClicked(MouseEvent e){
 		//System.out.println("Local Clicked")
 		JPopupMenu shower=new JPopupMenu();
-		JViewport viewport = scroll.getViewport();
+		JViewport viewport = zPanel.scroll.getViewport();
 		int xdif=viewport.getSize().width-dim.width;
 		int ydif=viewport.getSize().height-dim.height;
 		xdif=xdif/2;
@@ -953,12 +940,14 @@ public class Generator implements ActionListener {
 		if (ydif<0){
 			ydif=0;
 		}
-        Point h=viewport.getViewPosition();
+        Point h=viewport.getViewPosition();        
+        xdif+=2;
+        ydif+=2;
         //h is how much the user has scrolled, corrects for that.
 		int x=e.getX()+h.x-xdif;
 		int y=e.getY()+h.y-ydif;
-		int yrow=(int) Math.floor(y/(double)squareheight);
-		int xcol=(int) Math.floor(x/(double)squarewidth);
+		int yrow=(int) Math.floor(y/(zPanel.panel.scale*squareheight));
+		int xcol=(int) Math.floor(x/(zPanel.panel.scale*squarewidth));
 		if (yrow<0||xcol<0){
 			return;
 		}

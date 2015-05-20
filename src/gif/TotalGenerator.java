@@ -76,6 +76,7 @@ public class TotalGenerator {
 		saver=save;
 	}
 	public void readList(File f, int q){
+		vert=q;
 		try{
 			saver.createNewFile();
 		}
@@ -377,12 +378,13 @@ public class TotalGenerator {
 			return;
 		}
 		//regular horizontal tooltip
+		System.out.println(vert);
 		if (vert==0){
 			System.out.println(squareheight+", "+squarewidth);
 			System.out.println(x+", "+y+"||"+xcol+", "+yrow);
 			if (yrow*sqrt+xcol<list.size()){
 				shower.add(new JLabel("Base is "+basetobase.get(list.get(yrow*sqrt+xcol))));
-				shower.add(new JLabel("Position: "+(yrow*sqrt+xcol)));
+				shower.add(new JLabel("Position: "+((yrow*sqrt+xcol)+1)));
 				shower.show(e.getComponent(), x+xdif-h.x, y+ydif-h.y);
 			}
 		}

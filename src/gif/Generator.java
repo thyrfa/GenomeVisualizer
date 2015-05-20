@@ -124,9 +124,6 @@ public class Generator implements ActionListener {
 	//Takes the given string and converts it to .cfa, adds on the stuff at the end with z's seperating, writes .counter for easy check on compression.
 	public void makeList(String s, File f, boolean done){
 		s=s.toLowerCase();
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		width = screenSize.getWidth();
-		height = screenSize.getHeight();
 		File one=new File(f.getParentFile().getAbsolutePath()+fileprefix+f.getName().substring(0, f.getName().indexOf("."))+".cfa");
 		System.out.println(one.toString());
 		char lastchar='y';
@@ -662,6 +659,9 @@ public class Generator implements ActionListener {
 		if (fileChooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
 		  g = fileChooser.getSelectedFile();
 		}
+		else{
+			System.exit(0);
+		}
 		saveloc = g;
 		saver = g;
 		a=f;
@@ -893,6 +893,9 @@ public class Generator implements ActionListener {
 		try{
 			FileReader ist = new FileReader(f.getParentFile()+fileprefix+f.getName().substring(0, f.getName().indexOf("."))+".counter");
 			BufferedReader in = new BufferedReader(ist);
+			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			width = screenSize.getWidth();
+			height = screenSize.getHeight();
 			String s = in.readLine();
 			int listsize = Integer.parseInt(s.substring(s.indexOf("to")+3));
 			System.out.println("Listsize: "+listsize);
@@ -905,25 +908,24 @@ public class Generator implements ActionListener {
 				squareheight=1;
 				sqrt=(int) Math.sqrt(listsize);
 			}
+			System.out.println("sqrt: "+sqrt);
 			if (!xsize.getText().equals("")&&!ysize.getText().equals("")){
-				boolean cat=false;
 				try{
 					squarewidth=Integer.parseInt(xsize.getText());
 					squareheight=Integer.parseInt(ysize.getText());
-					sqrt=(int) Math.sqrt(listsize);
-					
+					sqrt=(int)(width/squarewidth);
+					System.out.println("sqrt1: "+sqrt);
 				}
 				catch(Exception e){
-					cat=true;
 					squarewidth=(int)(width/sqrt);
 					sqrt=(int) Math.sqrt(listsize);
 					squareheight=(int)(height/Math.ceil(listsize / (double)sqrt));
+					System.out.println("sqrt2: "+sqrt);
 				}
 			}
-			if (((int)Math.ceil(listsize / sqrt)+1)*squareheight>height){
-				System.out.println("last if");
-				sqrt=(int)Math.floor(width/squarewidth);
-			}
+			System.out.println("SW: "+squarewidth);
+			System.out.println("SH: "+squareheight);
+			System.out.println("sqrt: "+sqrt);
 			if (!imglngth.getText().equals("")){
 				System.out.println("sqrt yes");
 				try{
@@ -1075,6 +1077,9 @@ public class Generator implements ActionListener {
 	    			e.printStackTrace();
 	    		}
 	    	}
+	    }
+	    else{
+	    	System.exit(0);
 	    }
 		
 	}

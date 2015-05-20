@@ -895,9 +895,10 @@ public class Generator implements ActionListener {
 			BufferedReader in = new BufferedReader(ist);
 			String s = in.readLine();
 			int listsize = Integer.parseInt(s.substring(s.indexOf("to")+3));
+			System.out.println("Listsize: "+listsize);
 			sqrt=(int) Math.sqrt(listsize);
 			squarewidth=(int)(width/sqrt);
-			sqrt=(int)(sqrt+((width-(squarewidth*sqrt))/squarewidth));
+			sqrt=(int) Math.sqrt(listsize);
 			squareheight=(int)(height/Math.ceil(listsize / (double)sqrt));
 			if (squarewidth<=0 ||squareheight<=0){
 				squarewidth=1;
@@ -914,21 +915,22 @@ public class Generator implements ActionListener {
 				}
 				catch(Exception e){
 					cat=true;
-				}
-				if (cat){
 					squarewidth=(int)(width/sqrt);
-					sqrt=(int)(sqrt+((width-(squarewidth*sqrt))/squarewidth));
+					sqrt=(int) Math.sqrt(listsize);
 					squareheight=(int)(height/Math.ceil(listsize / (double)sqrt));
 				}
 			}
 			if (((int)Math.ceil(listsize / sqrt)+1)*squareheight>height){
+				System.out.println("last if");
 				sqrt=(int)Math.floor(width/squarewidth);
 			}
 			if (!imglngth.getText().equals("")){
+				System.out.println("sqrt yes");
 				try{
 					sqrt = Integer.parseInt(imglngth.getText())/squarewidth;
 				}catch(Exception e){}
 			}
+			System.out.println("sqrt: "+sqrt);
 			in.close();
 			ist.close();
 		}catch(Exception e){}

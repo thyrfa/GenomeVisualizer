@@ -518,7 +518,7 @@ public class PairGenerator implements ActionListener{
 		panel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		scroll = new JScrollPane (new JLabel(new ImageIcon(image)), 
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		scroll.addMouseListener(new MouseWatcher(this));
+		//scroll.addMouseListener(new MouseWatcher(this));
 		panel.getContentPane().add(scroll);
 		panel.add(new JLabel("Number of bases represented: "+numchars+"  Number of squares on screen: "+list.size()), BorderLayout.PAGE_END);
 		panel.pack();
@@ -658,7 +658,7 @@ public class PairGenerator implements ActionListener{
 		panel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         scroll = new JScrollPane (new JLabel(new ImageIcon(image)), 
       		   JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		scroll.addMouseListener(new MouseWatcher(this));
+		//scroll.addMouseListener(new MouseWatcher(this));
 		panel.getContentPane().add(scroll);
  		panel.add(new JLabel("Number of bases represented: "+numchars+"  Number of squares on screen: "+list.size()), BorderLayout.PAGE_END);
  		panel.pack();
@@ -881,7 +881,7 @@ public class PairGenerator implements ActionListener{
 		panel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		scroll = new JScrollPane (new JLabel(new ImageIcon(image)), 
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		scroll.addMouseListener(new MouseWatcher(this));
+		//scroll.addMouseListener(new MouseWatcher(this));
 		g.dispose();
 		//System.out.println(scroll.getSize());
 		panel.getContentPane().add(scroll);

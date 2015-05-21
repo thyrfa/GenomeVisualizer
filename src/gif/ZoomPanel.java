@@ -26,32 +26,44 @@ public class ZoomPanel
 	ImagePanel panel;
 	
 	public ZoomPanel(MouseWatcher m, BufferedImage i){
-		panel = new ImagePanel(i);
+        JFrame f = new JFrame();
+		panel = new ImagePanel(i, f);
 		dim = new Dimension(panel.image.getWidth(), panel.image.getHeight());
         ImageZoom zoom = new ImageZoom(panel);
-        JFrame f = new JFrame();
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.getContentPane().add(zoom.getUIPanel(), "North");
         scroll = new JScrollPane(panel);
+        panel.setSBDimension(scroll.getHorizontalScrollBar().getPreferredSize(), scroll.getVerticalScrollBar().getPreferredSize());
         scroll.addMouseListener(m);
         f.getContentPane().add(scroll);
         f.setExtendedState(JFrame.MAXIMIZED_BOTH);
         f.setVisible(true);
 	}
 }
-  
+
 class ImagePanel extends JPanel
 {
     BufferedImage image;
     double scale;
+    JFrame cont;
+    int spinHeight;
+    Dimension vScroll;
+    Dimension hScroll;
   
-    public ImagePanel(BufferedImage i)
+    public ImagePanel(BufferedImage i, JFrame f)
     {
+    	cont = f;
     	image = i;
         scale = 1.0;
         setBackground(Color.black);
     }
-  
+    public void setSpinHeight(int i){
+    	spinHeight = i;
+    }
+    public void setSBDimension(Dimension d1, Dimension d2){
+    	 hScroll = d1;
+    	 vScroll = d2;
+    }
     protected void paintComponent(Graphics g)
     {
         super.paintComponent(g);
@@ -67,6 +79,9 @@ class ImagePanel extends JPanel
         AffineTransform at = AffineTransform.getTranslateInstance(x,y);
         at.scale(scale, scale);
         g2.drawRenderedImage(image, at);
+        if (scale<1){
+        	cont.setSize((int)(getPreferredSize().width - vScroll.getWidth()), (int)(getPreferredSize().height - spinHeight - hScroll.getHeight()));
+        }
     }
   
     /**
@@ -98,9 +113,10 @@ class ImageZoom
   
     public JPanel getUIPanel()
     {
-        SpinnerNumberModel model = new SpinnerNumberModel(1.0, 0.1, 1.5, .01);
+        SpinnerNumberModel model = new SpinnerNumberModel(1.0, 0.5, 2.0, .01);
         final JSpinner spinner = new JSpinner(model);
         spinner.setPreferredSize(new Dimension(45, spinner.getPreferredSize().height));
+        imagePanel.setSpinHeight(spinner.getPreferredSize().height);
         spinner.addChangeListener(new ChangeListener()
         {
             public void stateChanged(ChangeEvent e)

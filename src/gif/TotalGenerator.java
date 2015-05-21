@@ -34,7 +34,6 @@ public class TotalGenerator {
 	public File a;
 	public HashMap<Character, String> basetobase= new HashMap<Character, String>();
 	JFrame panel;
-	Zoomable zoom = new Zoomable();
 	double width;
 	double height;
 	JTextField acolor;

@@ -337,8 +337,8 @@ public class TotalGenerator {
 	public void mouseClicked(MouseEvent e){
 		JPopupMenu shower=new JPopupMenu();
 		JViewport viewport = zPanel.scroll.getViewport();
-		int xdif=viewport.getSize().width-dim.width;
-		int ydif=viewport.getSize().height-dim.height;
+		int xdif=viewport.getSize().width-zPanel.panel.getPreferredSize().width;
+		int ydif=viewport.getSize().height-zPanel.panel.getPreferredSize().height;
 		xdif=xdif/2;
 		ydif=ydif/2; //ydif and xdif are the difference in location between the edge of the scrollframe and the picture, can find what pixel of the IMAGE was clicked on.
 		if (xdif<0){
@@ -348,9 +348,10 @@ public class TotalGenerator {
 			ydif=0;
 		}
         Point h=viewport.getViewPosition();        
-        xdif+=2;
-        ydif+=2;
+        xdif+=(zPanel.panel.scale*squarewidth)/5;
+        ydif+=(zPanel.panel.scale*squareheight)/5;
         //h is how much the user has scrolled, corrects for that.
+        System.out.println(e.getX()+", real "+e.getY());
 		int x=e.getX()+h.x-xdif;
 		int y=e.getY()+h.y-ydif;
 		int yrow=(int) Math.floor(y/(zPanel.panel.scale*squareheight));
@@ -359,7 +360,7 @@ public class TotalGenerator {
 			return;
 		}
 		//regular horizontal tooltip
-		System.out.println(vert);
+		System.out.println(x+", "+y);
 		if (vert==0){
 			System.out.println(squareheight+", "+squarewidth);
 			System.out.println(x+", "+y+"||"+xcol+", "+yrow);

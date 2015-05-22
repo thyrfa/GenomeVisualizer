@@ -79,9 +79,6 @@ class ImagePanel extends JPanel
         AffineTransform at = AffineTransform.getTranslateInstance(x,y);
         at.scale(scale, scale);
         g2.drawRenderedImage(image, at);
-        if (scale<1){
-        	cont.setSize((int)(getPreferredSize().width - vScroll.getWidth()), (int)(getPreferredSize().height - spinHeight - hScroll.getHeight()));
-        }
     }
   
     /**

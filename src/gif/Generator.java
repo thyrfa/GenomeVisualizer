@@ -673,7 +673,7 @@ public class Generator implements ActionListener {
 		panel.add(colorz, c);
 		c.gridy=4;
 		c.gridx=1;
-		panel.add(new JLabel("Length of image in pixels? (Blank for default)"), c);
+		panel.add(new JLabel("Number of squares lengthwise?"), c);
 		c.gridy++;
 		imglngth = new JTextField(6);
 		panel.add(imglngth, c);
@@ -916,7 +916,7 @@ public class Generator implements ActionListener {
 			if (!imglngth.getText().equals("")){
 				System.out.println("sqrt yes");
 				try{
-					sqrt = Integer.parseInt(imglngth.getText())/squarewidth;
+					sqrt = Integer.parseInt(imglngth.getText());
 				}catch(Exception e){}
 			}
 			System.out.println("sqrt: "+sqrt);

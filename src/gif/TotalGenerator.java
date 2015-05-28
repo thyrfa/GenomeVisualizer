@@ -72,7 +72,7 @@ public class TotalGenerator {
 		sqrt = dim[2];
 		saver=save;
 	}
-	public void readList(File f, int q){
+	public void readList(File f, int q, int start, int end){
 		vert=q;
 		try{
 			saver.createNewFile();
@@ -96,12 +96,19 @@ public class TotalGenerator {
 			BufferedReader cin = new BufferedReader(countz);
 			String counts = cin.readLine();
 			int num = Integer.parseInt(counts.substring(counts.indexOf("to")+3));
+			if (start>0){
+				num = end - start;
+			}
 			cin.close();
 			countz.close();
 			list = new ArrayList<Character>(num);
 			FileReader ist = new FileReader(f);
 			BufferedReader in = new BufferedReader(ist);
 			while(t==true){
+				int y = start;
+				while (y > 0){
+					in.read();
+				}
 				c=in.read();
 				if (ch=='z'){
 					inlast=true;
@@ -137,9 +144,9 @@ public class TotalGenerator {
 				}
 				else if ((char)c!=ch&&(char)c!='0'&&ch!='@'){
 					n=Integer.parseInt(s.toString().replace(ch, '1'), 2);
-					if (n>20000){
-						n=20000;
-					}
+					//if (n>20000){
+					//	n=20000;
+					//}
 					total+=n;
 					counter++;
 					for (int z = 0; z<n; z++){
@@ -165,10 +172,13 @@ public class TotalGenerator {
 			System.out.println(e.getCause());
 		}
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		if (end > 0){
+			list = (ArrayList<Character>)list.subList(0, end);
+		}
 		list.trimToSize();
 		width = screenSize.getWidth();
 		height = screenSize.getHeight();
-		numchars=total;
+		numchars=list.size();
 		System.out.println("End 1");
 		if (q==1){
 			makeImage();

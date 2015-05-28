@@ -79,6 +79,9 @@ public class Generator implements ActionListener {
 	File saveloc;
 	JTextField imglngth;
 	ZoomPanel zPanel;
+	JTextField startIndex;
+	JTextField endIndex;
+	
 	static HashMap<Character, Color> colorstat= new HashMap<Character, Color>();
     static {
 		colorstat.put('a', Color.red);
@@ -226,7 +229,7 @@ public class Generator implements ActionListener {
 
 	}
 	//parses .cfa for individual compressed display
-	public void readList(File f){
+	public void readList(File f, int start, int end){
 		try{
 			saver.createNewFile();
 		}
@@ -250,6 +253,10 @@ public class Generator implements ActionListener {
 			FileReader ist = new FileReader(f);
 			BufferedReader in = new BufferedReader(ist);
 			while(t==true){
+				int q = start;
+				while (q>0){
+					in.read();
+				}
 				c=in.read();
 				if (ch=='z'){
 					inlast=true;
@@ -666,26 +673,15 @@ public class Generator implements ActionListener {
 		JButton colorz= new JButton("Customize Colors");
 		colorz.setActionCommand("colors");
 		colorz.addActionListener(this);
-		c.gridy=8;
-		c.gridx=1;
-		panel.add(new JLabel("    "), c);
-		c.gridy++;
-		panel.add(colorz, c);
-		c.gridy=4;
-		c.gridx=1;
-		panel.add(new JLabel("Number of squares lengthwise?"), c);
-		c.gridy++;
-		imglngth = new JTextField(6);
-		panel.add(imglngth, c);
-		c.gridy++;
-		panel.add(question, c);
-		c.gridx++;
-		c.gridy=6;
-		panel.add(new JLabel("    "), c);
-		c.gridy=7;
-		panel.add(snake, c);
-		c.gridx=0;
-		panel.add(make, c);
+	    ButtonGroup bG = new ButtonGroup();
+		JRadioButton single= new JRadioButton("Compressed");
+		bG.add(single);
+		JRadioButton uncompress= new JRadioButton("Uncompressed");
+		uncompress.addActionListener(this);
+		uncompress.setActionCommand("uncompress");
+		bG.add(uncompress);
+		single.addActionListener(this);
+		single.setActionCommand("sing");
 		c.gridy=0;
 		c.gridx=0;
 		panel.add(new JLabel("X"), c);
@@ -705,18 +701,43 @@ public class Generator implements ActionListener {
 		panel.add(new JLabel("Would you like compressed or uncompressed bases?"), c);
 		c.gridx=0;
 		c.gridy=3;
-	    ButtonGroup bG = new ButtonGroup();
-		JRadioButton single= new JRadioButton("Compressed");
-		bG.add(single);
-		JRadioButton uncompress= new JRadioButton("Uncompressed");
-		uncompress.addActionListener(this);
-		uncompress.setActionCommand("uncompress");
-		bG.add(uncompress);
-		single.addActionListener(this);
-		single.setActionCommand("sing");
 		panel.add(single, c);
 		c.gridx=2;
 		panel.add(uncompress, c);
+		c.gridy=4;
+		c.gridx=1;
+		panel.add(new JLabel("Number of squares lengthwise?"), c);
+		c.gridy = 5;
+		imglngth = new JTextField(6);
+		panel.add(imglngth, c);
+		c.gridy = 6;
+		c.gridx = 0;
+		panel.add(new JLabel("Start"));
+		c.gridx = 1;
+		panel.add(new JLabel("Start and end index of the sequence"));
+		c.gridx = 2;
+		panel.add(new JLabel("End"));
+		c.gridy = 7;
+		c.gridx = 0;
+		startIndex = new JTextField(10);
+		endIndex = new JTextField(10);
+		panel.add(startIndex, c);
+		c.gridx = 2;
+		panel.add(endIndex, c);
+		c.gridy = 8;
+		panel.add(question, c);
+		c.gridx++;
+		c.gridy=9;
+		panel.add(new JLabel("    "), c);
+		c.gridy=10;
+		panel.add(snake, c);
+		c.gridx=0;
+		panel.add(make, c);
+		c.gridy=11;
+		c.gridx=1;
+		panel.add(new JLabel("    "), c);
+		c.gridy++;
+		panel.add(colorz, c);
 		panel.pack();
 		panel.setVisible(true);
 	}

@@ -252,11 +252,8 @@ public class Generator implements ActionListener {
 		try{
 			FileReader ist = new FileReader(f);
 			BufferedReader in = new BufferedReader(ist);
+			int q = start;
 			while(t==true){
-				int q = start;
-				while (q>0){
-					in.read();
-				}
 				c=in.read();
 				if (ch=='z'){
 					inlast=true;
@@ -299,6 +296,13 @@ public class Generator implements ActionListener {
 				}
 				else if ((char)c!=ch&&(char)c!='0'&&ch!='@'){
 					n=Integer.parseInt(s.toString().replace(ch, '1'), 2);
+					if (q-n > 0){
+						q -= n;
+						continue;
+					}
+					if (total>= start){
+						continue;
+					}
 					for(int z = 0; z < Math.ceil(n/5); z++){
 						total+=n;
 						counter++;
@@ -685,9 +689,9 @@ public class Generator implements ActionListener {
 		c.gridy=0;
 		c.gridx=0;
 		panel.add(new JLabel("X"), c);
-		c.gridx++;
+		c.gridx = 1;
 		panel.add(new JLabel("Size of the boxes in pixels, leave blank for default size"), c);
-		c.gridx++;
+		c.gridx = 2;
 		panel.add(new JLabel("Y"), c);
 		xsize=new JTextField(4);
 		ysize=new JTextField(4);
@@ -711,29 +715,33 @@ public class Generator implements ActionListener {
 		imglngth = new JTextField(6);
 		panel.add(imglngth, c);
 		c.gridy = 6;
-		c.gridx = 0;
-		panel.add(new JLabel("Start"));
-		c.gridx = 1;
-		panel.add(new JLabel("Start and end index of the sequence"));
-		c.gridx = 2;
-		panel.add(new JLabel("End"));
+		panel.add(new JLabel("   "), c);
 		c.gridy = 7;
+		c.gridx = 0;
+		panel.add(new JLabel("Start"), c);
+		c.gridx = 1;
+		panel.add(new JLabel("Start and end index of the sequence"), c);
+		c.gridx = 2;
+		panel.add(new JLabel("End"), c);
+		c.gridy = 8;
 		c.gridx = 0;
 		startIndex = new JTextField(10);
 		endIndex = new JTextField(10);
 		panel.add(startIndex, c);
 		c.gridx = 2;
 		panel.add(endIndex, c);
-		c.gridy = 8;
+		c.gridy = 9;
+		c.gridx = 1;
+		panel.add(new JLabel("   "), c);
 		panel.add(question, c);
-		c.gridx++;
-		c.gridy=9;
+		c.gridx = 2;
+		c.gridy = 11;
 		panel.add(new JLabel("    "), c);
-		c.gridy=10;
+		c.gridy=12;
 		panel.add(snake, c);
 		c.gridx=0;
 		panel.add(make, c);
-		c.gridy=11;
+		c.gridy=13;
 		c.gridx=1;
 		panel.add(new JLabel("    "), c);
 		c.gridy++;
@@ -819,6 +827,20 @@ public class Generator implements ActionListener {
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		int start = -1;
+		int end = -1;
+		if (startIndex.getText().equals("")){
+			start = 0;
+		}
+		else {
+			start = Integer.parseInt(startIndex.getText());
+		}
+		if (endIndex.getText().equals("")){
+			end = 0;
+		}
+		else {
+			end = Integer.parseInt(endIndex.getText());
+		}
 		//load color selection
 		if (e.getActionCommand().equals("colors")){
 			pickColors();
@@ -870,13 +892,12 @@ public class Generator implements ActionListener {
 			vert=-1;
 			panel.dispose();
 			if (uncompressed){
-				new TotalGenerator(saveloc, fileprefix, dimensions(a)).readList(a, -1);
-
+				new TotalGenerator(saveloc, fileprefix, dimensions(a)).readList(a, -1, start, end);
 			}
 			else{
 				panel=new JFrame();
 				panel.setLayout(new BorderLayout());
-				readList(a);
+				readList(a, start, end);
 				display(-1);
 			}
 		}
@@ -885,12 +906,12 @@ public class Generator implements ActionListener {
 			vert=0;
 			panel.dispose();
 			if (uncompressed){
-				new TotalGenerator(saveloc, fileprefix, dimensions(a)).readList(a, 1);
+				new TotalGenerator(saveloc, fileprefix, dimensions(a)).readList(a, 1, start, end);
 			}
 			else{
 				panel=new JFrame();
 				panel.setLayout(new BorderLayout());
-				readList(a);
+				readList(a, start, end);
 				display(0);
 			}
 			
@@ -907,6 +928,17 @@ public class Generator implements ActionListener {
 			String s = in.readLine();
 			int listsize = Integer.parseInt(s.substring(s.indexOf("to")+3));
 			System.out.println("Listsize: "+listsize);
+			if (!startIndex.getText().equals("")||!endIndex.getText().equals("")){
+				int st = 0;
+				int e = listsize;
+				if (!endIndex.getText().equals("")){
+					e = Integer.parseInt(endIndex.getText());
+				}
+				if (!startIndex.getText().equals("")){
+					st = Integer.parseInt(startIndex.getText());
+				}
+				listsize = e - st;
+			}
 			sqrt=(int) Math.sqrt(listsize);
 			squarewidth=(int)(width/sqrt);
 			sqrt=(int) Math.sqrt(listsize);

@@ -261,6 +261,7 @@ public class Generator implements ActionListener {
 				}
 				//System.out.println("Dots: "+dots);
 				if (c==-1){
+					System.out.println(s.toString());
 					numchars=Integer.parseInt(s.toString());
 					t=false;
 					return;
@@ -294,26 +295,23 @@ public class Generator implements ActionListener {
 						ranthree=true;
 					}*/
 				}
-				else if ((char)c!=ch&&(char)c!='0'&&ch!='@'){
+				else if ((char)c != ch && (char)c != '0' && ch != '@'){
 					n=Integer.parseInt(s.toString().replace(ch, '1'), 2);
-					if (q-n > 0){
+					if (q - n > 0){
 						q -= n;
-						continue;
-					}
-					if (total>= start){
-						continue;
+						n = 0;
 					}
 					for(int z = 0; z < Math.ceil(n/5); z++){
 						total+=n;
 						counter++;
 						list.add(new ColorCounter(n, ch, total));
-						System.out.println(counter);
+						//System.out.println(counter);
 					}
 					s= new StringBuilder();
 					ch=(char)c;
 					s.append((char)c);
 				}
-				else if ((char)c!=ch&&(char)c!='0'){
+				else if ((char)c != ch && (char)c != '0'){
 					ch=(char)c;
 					s.append((char)c);
 				}
@@ -479,6 +477,7 @@ public class Generator implements ActionListener {
 		//System.out.println(panel.getContentPane().getSize());
 	}
 	public void makeSnakeImage(){
+		System.out.println(sqrt+" "+squarewidth+" "+squareheight);
 		image = new BufferedImage(sqrt*squarewidth, (int)(squareheight*Math.ceil(list.size()/(double)sqrt)), BufferedImage.TYPE_INT_RGB);
 		dim= new Dimension(image.getWidth(), image.getHeight());
 		Color c;
@@ -895,6 +894,7 @@ public class Generator implements ActionListener {
 				new TotalGenerator(saveloc, fileprefix, dimensions(a)).readList(a, -1, start, end);
 			}
 			else{
+				dimensions(a);
 				panel=new JFrame();
 				panel.setLayout(new BorderLayout());
 				readList(a, start, end);
@@ -909,6 +909,7 @@ public class Generator implements ActionListener {
 				new TotalGenerator(saveloc, fileprefix, dimensions(a)).readList(a, 1, start, end);
 			}
 			else{
+				dimensions(a);
 				panel=new JFrame();
 				panel.setLayout(new BorderLayout());
 				readList(a, start, end);

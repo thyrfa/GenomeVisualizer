@@ -54,6 +54,8 @@ public class TotalGenerator {
 	int counter;
 	File saver;
 	ZoomPanel zPanel;
+	int start;
+	int end;
 	
 	public TotalGenerator(File save, String pre, int[] dim) {
 		fileprefix = pre;
@@ -73,6 +75,9 @@ public class TotalGenerator {
 		saver=save;
 	}
 	public void readList(File f, int q, int start, int end){
+		this.start = start;
+		this.end = end;
+		System.out.println("Start: "+start+" End: "+end);
 		vert=q;
 		try{
 			saver.createNewFile();
@@ -97,18 +102,15 @@ public class TotalGenerator {
 			String counts = cin.readLine();
 			int num = Integer.parseInt(counts.substring(counts.indexOf("to")+3));
 			if (start>0){
-				num = end - start;
+				num -= start;
 			}
 			cin.close();
 			countz.close();
 			list = new ArrayList<Character>(num);
 			FileReader ist = new FileReader(f);
 			BufferedReader in = new BufferedReader(ist);
+			int y = start;
 			while(t==true){
-				int y = start;
-				while (y > 0){
-					in.read();
-				}
 				c=in.read();
 				if (ch=='z'){
 					inlast=true;
@@ -147,6 +149,19 @@ public class TotalGenerator {
 					//if (n>20000){
 					//	n=20000;
 					//}
+					if (y > 0){
+						//System.out.println("y: "+y+" "+n);
+						if (y - n <=0){
+							n = 0;
+							y = 0;
+						}
+						else{
+							int trans = n;
+							n -= y;
+							y -= trans;
+						}
+						//System.out.println("y: "+y);
+					}
 					total+=n;
 					counter++;
 					for (int z = 0; z<n; z++){
@@ -173,7 +188,8 @@ public class TotalGenerator {
 		}
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		if (end > 0){
-			list = (ArrayList<Character>)list.subList(0, end);
+			System.out.println(list.size());
+			list = new ArrayList<Character>(list.subList(0, end-start));
 		}
 		list.trimToSize();
 		width = screenSize.getWidth();
@@ -357,26 +373,27 @@ public class TotalGenerator {
 		if (ydif<0){
 			ydif=0;
 		}
+		System.out.println(xdif+" dif: "+ydif);
         Point h=viewport.getViewPosition();        
         xdif+=(zPanel.panel.scale*squarewidth)/5;
-        ydif+=(zPanel.panel.scale*squareheight)/5;
+        ydif+=(zPanel.panel.scale*squareheight+4)/5;
         //h is how much the user has scrolled, corrects for that.
         System.out.println(e.getX()+", real "+e.getY());
 		int x=e.getX()+h.x-xdif;
 		int y=e.getY()+h.y-ydif;
 		int yrow=(int) Math.floor(y/(zPanel.panel.scale*squareheight));
 		int xcol=(int) Math.floor(x/(zPanel.panel.scale*squarewidth));
+		System.out.println(squareheight+", "+squarewidth);
+		System.out.println(x+", "+y+"||"+xcol+", "+yrow);
 		if (yrow<0||xcol<0){
 			return;
 		}
 		//regular horizontal tooltip
 		System.out.println(x+", "+y);
 		if (vert==0){
-			System.out.println(squareheight+", "+squarewidth);
-			System.out.println(x+", "+y+"||"+xcol+", "+yrow);
 			if (yrow*sqrt+xcol<list.size()){
 				shower.add(new JLabel("Base is "+basetobase.get(list.get(yrow*sqrt+xcol))));
-				shower.add(new JLabel("Position: "+((yrow*sqrt+xcol)+1)));
+				shower.add(new JLabel("Position: "+((yrow*sqrt+xcol)+1+start)));
 				shower.show(e.getComponent(), x+xdif-h.x, y+ydif-h.y);
 			}
 		}
@@ -385,7 +402,7 @@ public class TotalGenerator {
 			//clicker if last line is odd
 			if ((int)Math.floor(dim.height/(double)squareheight)==yrow && yrow%2==1){
 				shower.add(new JLabel("Base is "+basetobase.get(list.get((yrow*list.size()%sqrt+(list.size()%sqrt-xcol))-1))));
-				shower.add(new JLabel("Position: "+((yrow*list.size()%sqrt+(list.size()%sqrt-xcol))-1)));
+				shower.add(new JLabel("Position: "+((yrow*list.size()%sqrt+(list.size()%sqrt-xcol))-1+start)));
 				shower.add(new JLabel("Going Left"));
 				shower.show(e.getComponent(), x+xdif-h.x, y+ydif-h.y);
 			}
@@ -393,13 +410,13 @@ public class TotalGenerator {
 			else if (yrow*sqrt+xcol<list.size()){
 				if (yrow%2==1){
 					shower.add(new JLabel("Base is "+basetobase.get(list.get((yrow*sqrt+(sqrt-xcol))-1))));
-					shower.add(new JLabel("Position: "+((yrow*sqrt+(sqrt-xcol))-1)));
+					shower.add(new JLabel("Position: "+((yrow*sqrt+(sqrt-xcol))-1+start)));
 					shower.add(new JLabel("Going left"));
 					shower.show(e.getComponent(), x+xdif-h.x, y+ydif-h.y);
 				}
 				else{
 					shower.add(new JLabel("Base is "+basetobase.get(list.get(yrow*sqrt+xcol))));
-					shower.add(new JLabel("Position: "+(yrow*sqrt+xcol)));
+					shower.add(new JLabel("Position: "+(yrow*sqrt+xcol+start)));
 					shower.add(new JLabel("Going right"));
 					shower.show(e.getComponent(), x+xdif-h.x, y+ydif-h.y);
 				}

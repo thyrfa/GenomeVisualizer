@@ -249,6 +249,7 @@ public class Generator implements ActionListener {
 		boolean ranone=false;
 		boolean rantwo=false;
 		boolean ranthree=false;
+		int y = start;
 		try{
 			FileReader ist = new FileReader(f);
 			BufferedReader in = new BufferedReader(ist);
@@ -288,20 +289,25 @@ public class Generator implements ActionListener {
 					}
 					else if (dots==3&&!ranthree){
 						//System.out.println("s:"+s.toString());
-						counter=Integer.parseInt(s.toString());
 						s=new StringBuilder();
 						ranthree=true;
 					}
 				}
 				else if ((char)c!=ch&&(char)c!='0'&&ch!='@'){
 					n=Integer.parseInt(s.toString().replace(ch, '1'), 2);
-					//System.out.println(s.toString().replace(ch, '1'));
-					//System.out.println(n);
-					total+=n;
-					counter++;
-					//System.out.println(ch+", "+n);
-					//System.out.println(total);
-					list.add(new ColorCounter(n, ch, total));
+					y -= n;
+					if (y<=0){
+						if (Math.abs(y) < n)
+							n = Math.abs(y);
+						total+=n;
+						counter++;
+						list.add(new ColorCounter(n, ch, total));
+					}
+					else if (y!=0){
+						total+=n;
+						counter++;
+						list.add(new ColorCounter(n, ch, total));
+					}
 					s= new StringBuilder();
 					ch=(char)c;
 					s.append((char)c);
@@ -316,7 +322,15 @@ public class Generator implements ActionListener {
 			}
 			in.close();
 			ist.close();
-			//list.trimToSize();
+			list.trimToSize();
+			if (end > 0){
+				for (int i = list.size(); list.get(i).getIndex() > end && i >= 1; i-- ){
+					if (list.get(i-1).getIndex() < end){
+						ColorCounter h = list.remove(i);
+						list.add(new ColorCounter(h.getIndex() - end, h.getCharacter(), end));
+					}
+				}
+			}
 		}
 		catch(Exception e){
 			e.printStackTrace();

@@ -40,4 +40,7 @@ public class ColorCounter {
 	public int getName(){
 		return name;
 	}
+	public void fixIndex(int i){
+		index +=i;
+	}
 }

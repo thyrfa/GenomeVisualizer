@@ -81,6 +81,8 @@ public class Generator implements ActionListener {
 	ZoomPanel zPanel;
 	JTextField startIndex;
 	JTextField endIndex;
+	int start;
+	int end;
 	
 	static HashMap<Character, Color> colorstat= new HashMap<Character, Color>();
     static {
@@ -230,6 +232,8 @@ public class Generator implements ActionListener {
 	}
 	//parses .cfa for individual compressed display
 	public void readList(File f, int start, int end){
+		this.start = start;
+		this.end = end;
 		try{
 			saver.createNewFile();
 		}
@@ -249,7 +253,6 @@ public class Generator implements ActionListener {
 		boolean ranone=false;
 		boolean rantwo=false;
 		boolean ranthree=false;
-		int y = start;
 		try{
 			FileReader ist = new FileReader(f);
 			BufferedReader in = new BufferedReader(ist);
@@ -263,7 +266,6 @@ public class Generator implements ActionListener {
 				if (c==-1){
 					numchars=Integer.parseInt(s.toString());
 					t=false;
-					return;
 				}
 				else if (inlast){
 					//System.out.println((char)c);
@@ -295,19 +297,9 @@ public class Generator implements ActionListener {
 				}
 				else if ((char)c!=ch&&(char)c!='0'&&ch!='@'){
 					n=Integer.parseInt(s.toString().replace(ch, '1'), 2);
-					y -= n;
-					if (y<=0){
-						if (Math.abs(y) < n)
-							n = Math.abs(y);
-						total+=n;
-						counter++;
-						list.add(new ColorCounter(n, ch, total));
-					}
-					else if (y!=0){
-						total+=n;
-						counter++;
-						list.add(new ColorCounter(n, ch, total));
-					}
+					total+=n;
+					counter++;
+					list.add(new ColorCounter(n, ch, total));
 					s= new StringBuilder();
 					ch=(char)c;
 					s.append((char)c);
@@ -323,11 +315,23 @@ public class Generator implements ActionListener {
 			in.close();
 			ist.close();
 			list.trimToSize();
+			/*for (int i = 0; i < list.size() && list.get(i).getIndex() <= (start + list.get(i).getNumber()); i++){
+				if (list.get(i).getIndex() > start){
+					ColorCounter h = list.remove(i);
+					list.add(0, new ColorCounter(h.getIndex() - start, h.getCharacter(), h.getIndex() - start));
+				}
+				else{
+					list.remove(i);
+				}
+			}*/
 			if (end > 0){
-				for (int i = list.size(); list.get(i).getIndex() > end && i >= 1; i-- ){
+				for (int i = list.size()-1; list.get(i).getIndex() > end && i >= 1; i-- ){
 					if (list.get(i-1).getIndex() < end){
 						ColorCounter h = list.remove(i);
 						list.add(new ColorCounter(h.getIndex() - end, h.getCharacter(), end));
+					}
+					else{
+						list.remove(i);
 					}
 				}
 			}
@@ -336,7 +340,6 @@ public class Generator implements ActionListener {
 			e.printStackTrace();
 			System.out.println(e.getCause());
 		}
-		
 	}
 	//called to choose what type of image to display.
 	public void display(int t){
@@ -389,7 +392,12 @@ public class Generator implements ActionListener {
 		System.out.println("sqrt: "+sqrt);
 		System.out.println(width);
 		System.out.println(squarewidth);
-		image = new BufferedImage(sqrt*squarewidth, (int)(squareheight*Math.ceil(list.size()/(double)sqrt)), BufferedImage.TYPE_INT_RGB);
+		if (list.size() < sqrt){
+			image = new BufferedImage(list.size()*squarewidth, (int)(squareheight), BufferedImage.TYPE_INT_RGB);
+		}
+		else{
+			image = new BufferedImage(sqrt*squarewidth, (int)(squareheight*Math.ceil(list.size()/(double)sqrt)), BufferedImage.TYPE_INT_RGB);
+		}
 		dim= new Dimension(image.getWidth(), image.getHeight());
 		Color c;
 		Graphics g = image.getGraphics(); 
@@ -487,7 +495,12 @@ public class Generator implements ActionListener {
 	}
 	public void makeSnakeImage(){
 		System.out.println(sqrt+" "+squarewidth+" "+squareheight);
-		image = new BufferedImage(sqrt*squarewidth, (int)(squareheight*Math.ceil(list.size()/(double)sqrt)), BufferedImage.TYPE_INT_RGB);
+		if (list.size() < sqrt){
+			image = new BufferedImage(list.size()*squarewidth, (int)(squareheight), BufferedImage.TYPE_INT_RGB);
+		}
+		else{
+			image = new BufferedImage(sqrt*squarewidth, (int)(squareheight*Math.ceil(list.size()/(double)sqrt)), BufferedImage.TYPE_INT_RGB);
+		}
 		dim= new Dimension(image.getWidth(), image.getHeight());
 		Color c;
 		Graphics g = image.getGraphics(); 
@@ -752,8 +765,12 @@ public class Generator implements ActionListener {
 		c.gridy=13;
 		c.gridx=1;
 		panel.add(new JLabel("    "), c);
-		c.gridy++;
+		c.gridy=14;
 		panel.add(colorz, c);
+		c.gridy=15;
+		JButton bed = new JButton("Select a bed file to use (Optional)");
+		make.setActionCommand("horiz");
+		make.addActionListener(this);
 		panel.pack();
 		panel.setVisible(true);
 	}
@@ -1020,7 +1037,7 @@ public class Generator implements ActionListener {
 			if (yrow*sqrt+xcol<list.size()){
 				shower.add(new JLabel("Base is "+basetobase.get(list.get(yrow*sqrt+xcol).getCharacter())));
 				shower.add(new JLabel("Amount represented: "+list.get(yrow*sqrt+xcol).getNumber()));
-				shower.add(new JLabel("Position: "+list.get(yrow*sqrt+xcol).getIndex()));
+				shower.add(new JLabel("Position: "+(list.get(yrow*sqrt+xcol).getIndex()-list.get(yrow*sqrt+xcol).getNumber())));
 				shower.show(e.getComponent(), x+xdif-h.x, y+ydif-h.y);
 			}
 		}
@@ -1030,7 +1047,7 @@ public class Generator implements ActionListener {
 			if ((int)Math.floor(dim.height/(double)squareheight)==yrow && yrow%2==1){
 				shower.add(new JLabel("Base is "+basetobase.get(list.get((yrow*list.size()%sqrt+(list.size()%sqrt-xcol))-1).getCharacter())));
 				shower.add(new JLabel("Amount represented: "+list.get((yrow*list.size()%sqrt+(list.size()%sqrt-xcol))-1).getNumber()));
-				shower.add(new JLabel("Position: "+list.get((yrow*list.size()%sqrt+(list.size()%sqrt-xcol))-1).getIndex()));
+				shower.add(new JLabel("Position: "+(list.get((yrow*list.size()%sqrt+(list.size()%sqrt-xcol))-1).getIndex()-list.get((yrow*list.size()%sqrt+(list.size()%sqrt-xcol))-1).getNumber())));
 				shower.add(new JLabel("Going Left"));
 				shower.show(e.getComponent(), x+xdif-h.x, y+ydif-h.y);
 			}
@@ -1039,14 +1056,14 @@ public class Generator implements ActionListener {
 				if (yrow%2==1){
 					shower.add(new JLabel("Base is "+basetobase.get(list.get((yrow*sqrt+(sqrt-xcol))-1).getCharacter())));
 					shower.add(new JLabel("Amount represented: "+list.get((yrow*sqrt+(sqrt-xcol))-1).getNumber()));
-					shower.add(new JLabel("Position: "+list.get((yrow*sqrt+(sqrt-xcol))-1).getIndex()));
+					shower.add(new JLabel("Position: "+(list.get((yrow*sqrt+(sqrt-xcol))-1).getIndex()-list.get((yrow*sqrt+(sqrt-xcol))-1).getNumber())));
 					shower.add(new JLabel("Going left"));
 					shower.show(e.getComponent(), x+xdif-h.x, y+ydif-h.y);
 				}
 				else{
 					shower.add(new JLabel("Base is "+basetobase.get(list.get(yrow*sqrt+xcol).getCharacter())));
 					shower.add(new JLabel("Amount represented: "+list.get(yrow*sqrt+xcol).getNumber()));
-					shower.add(new JLabel("Position: "+list.get(yrow*sqrt+xcol).getIndex()));
+					shower.add(new JLabel("Position: "+(list.get(yrow*sqrt+xcol).getIndex()-list.get(yrow*sqrt+xcol).getNumber())));
 					shower.add(new JLabel("Going right"));
 					shower.show(e.getComponent(), x+xdif-h.x, y+ydif-h.y);
 				}

@@ -146,11 +146,7 @@ public class TotalGenerator {
 				}
 				else if ((char)c!=ch&&(char)c!='0'&&ch!='@'){
 					n=Integer.parseInt(s.toString().replace(ch, '1'), 2);
-					//if (n>20000){
-					//	n=20000;
-					//}
 					if (y > 0){
-						//System.out.println("y: "+y+" "+n);
 						if (y - n <=0){
 							n = 0;
 							y = 0;
@@ -160,7 +156,6 @@ public class TotalGenerator {
 							n -= y;
 							y -= trans;
 						}
-						//System.out.println("y: "+y);
 					}
 					total+=n;
 					counter++;
@@ -189,9 +184,13 @@ public class TotalGenerator {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		if (end > 0){
 			System.out.println(list.size());
-			list = new ArrayList<Character>(list.subList(0, end-start));
+			list = new ArrayList<Character>(list.subList(0, end-start+1));
 		}
 		list.trimToSize();
+		System.out.println("ListSize: "+list.size());
+		for (Character ca : list){
+			System.out.println(ca);
+		}
 		width = screenSize.getWidth();
 		height = screenSize.getHeight();
 		numchars=list.size();
@@ -210,7 +209,12 @@ public class TotalGenerator {
 		panel.setLayout(new BorderLayout());
 		int k=0;
 		int lastindex=list.size()-1;
-		image = new BufferedImage(sqrt*squarewidth, (int)(squareheight*Math.ceil(lastindex/(double)sqrt)), BufferedImage.TYPE_INT_RGB);
+		if (list.size() < sqrt){
+			image = new BufferedImage(list.size()*squarewidth, (int)(squareheight), BufferedImage.TYPE_INT_RGB);
+		}
+		else{
+			image = new BufferedImage(sqrt*squarewidth, (int)(squareheight*Math.ceil(list.size()/(double)sqrt)), BufferedImage.TYPE_INT_RGB);
+		}
 		dim= new Dimension(image.getWidth(), image.getHeight());
 		Color c;
 		Graphics g = image.getGraphics();
@@ -271,7 +275,12 @@ public class TotalGenerator {
 		int k=0;
 		int listindex=0;
 		int lastindex=list.size()-1;
-		image = new BufferedImage(sqrt*squarewidth, (int)(squareheight*Math.ceil(lastindex/(double)sqrt)), BufferedImage.TYPE_INT_RGB);
+		if (list.size() < sqrt){
+			image = new BufferedImage(list.size()*squarewidth, (int)(squareheight), BufferedImage.TYPE_INT_RGB);
+		}
+		else{
+			image = new BufferedImage(sqrt*squarewidth, (int)(squareheight*Math.ceil(list.size()/(double)sqrt)), BufferedImage.TYPE_INT_RGB);
+		}
 		dim= new Dimension(image.getWidth(), image.getHeight());
 		Color c;
 		Graphics g = image.getGraphics(); 

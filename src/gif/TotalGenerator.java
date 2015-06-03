@@ -56,6 +56,7 @@ public class TotalGenerator {
 	ZoomPanel zPanel;
 	int start;
 	int end;
+	HashMap<Integer, String> data = null;
 	
 	public TotalGenerator(File save, String pre, int[] dim) {
 		fileprefix = pre;
@@ -73,6 +74,35 @@ public class TotalGenerator {
 		squareheight = dim[1];
 		sqrt = dim[2];
 		saver=save;
+	}
+	public void readData(File f, String s){
+		try{
+			FileReader countz = new FileReader(f);
+			BufferedReader cin = new BufferedReader(countz);
+			data = new HashMap<Integer, String>();
+			boolean t = true;
+			while (t){
+				int start;
+				int end;
+				String contains;
+				String line = cin.readLine();
+				if (line == null)
+					t = false;
+				else if (line.contains(s)){
+					String[] split = s.split("\t");
+					start = Integer.parseInt(split[1]);
+					end = Integer.parseInt(split[2]);
+					contains = split[3].split("\u0020")[0];
+					for (int i = start; i<end; i++){
+						data.put(i, contains);
+					}
+				}
+			}
+			cin.close();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 	public void readList(File f, int q, int start, int end){
 		this.start = start;
@@ -205,6 +235,10 @@ public class TotalGenerator {
 	public void makeImage(){
 		//System.out.println(xsize.getText());
 		//System.out.println(ysize.getText());
+		boolean hasBat = false;
+		if (data != null){
+			hasBat = true;
+		}
 		panel=new JFrame("Horizontal");
 		panel.setLayout(new BorderLayout());
 		int k=0;
@@ -224,6 +258,11 @@ public class TotalGenerator {
 				for (int n=0; k<lastindex; n++){
 					c= colors.get(list.get(listindex));
 					k++;
+					if (hasBat && data.containsKey(listindex)){
+						for (int p=0; p<5;p++){
+							c=c.brighter();
+						}
+					}
 					g.setColor(c);
 					g.fillRect((n*squarewidth), i*squareheight, squarewidth, squareheight);
 					g.setColor(Color.black);
@@ -238,6 +277,11 @@ public class TotalGenerator {
 				for (int n=0; n<sqrt; n++){
 					c= colors.get(list.get(listindex));
 					k++;
+					if (hasBat && data.containsKey(listindex)){
+						for (int p=0; p<5;p++){
+							c=c.brighter();
+						}
+					}
 					g.setColor(c);
 					g.fillRect((n*squarewidth), i*squareheight, squarewidth, squareheight);
 					g.setColor(Color.black);
@@ -270,6 +314,10 @@ public class TotalGenerator {
 	public void makeSnakeImage(){
 		panel=new JFrame("Snake");
 		panel.setLayout(new BorderLayout());
+		boolean hasBat = false;
+		if (data != null){
+			hasBat = true;
+		}
 		//System.out.println(xsize.getText());
 		//System.out.println(ysize.getText());
 		int k=0;
@@ -292,6 +340,11 @@ public class TotalGenerator {
 					//System.out.println(Math.ceil(list.size()/20.0));
 					c= colors.get(list.get(listindex));
 					k++;
+					if (hasBat && data.containsKey(listindex)){
+						for (int p=0; p<5;p++){
+							c=c.brighter();
+						}
+					}
 					//System.out.println(c);
 					//System.out.println(list.get((i*sqrt)+n).getCharacter());
 					//System.out.println(c);
@@ -308,6 +361,11 @@ public class TotalGenerator {
 				for (int n=(lastindex%sqrt); k<lastindex; n--){
 					c= colors.get(list.get(listindex));
 					k++;
+					if (hasBat && data.containsKey(listindex)){
+						for (int p=0; p<5;p++){
+							c=c.brighter();
+						}
+					}
 					g.setColor(c);
 					g.fillRect((n*squarewidth)-squarewidth, i*squareheight, squarewidth, squareheight);
 					g.setColor(Color.black);
@@ -324,6 +382,11 @@ public class TotalGenerator {
 				k++;
 				//System.out.println(list.get((i*20)+n).getCharacter());
 				//System.out.println(c);
+				if (hasBat && data.containsKey(listindex)){
+					for (int p=0; p<5;p++){
+						c=c.brighter();
+					}
+				}
 				g.setColor(c);
 				g.fillRect((n*squarewidth), i*squareheight, squarewidth, squareheight);
 				g.setColor(Color.black);
@@ -341,6 +404,11 @@ public class TotalGenerator {
 					k++;
 					//System.out.println(list.get((i*20)+n).getCharacter());
 					//System.out.println(c);
+					if (hasBat && data.containsKey(listindex)){
+						for (int p=0; p<5;p++){
+							c=c.brighter();
+						}
+					}
 					g.setColor(c);
 					g.fillRect((n*squarewidth), i*squareheight, squarewidth, squareheight);
 					g.setColor(Color.black);
@@ -370,6 +438,10 @@ public class TotalGenerator {
 		g.dispose();
 	}
 	public void mouseClicked(MouseEvent e){
+		boolean hasBat = false;
+		if (data != null){
+			hasBat = true;
+		}
 		JPopupMenu shower=new JPopupMenu();
 		JViewport viewport = zPanel.scroll.getViewport();
 		int xdif=viewport.getSize().width-zPanel.panel.getPreferredSize().width;
@@ -403,6 +475,9 @@ public class TotalGenerator {
 			if (yrow*sqrt+xcol<list.size()){
 				shower.add(new JLabel("Base is "+basetobase.get(list.get(yrow*sqrt+xcol))));
 				shower.add(new JLabel("Position: "+((yrow*sqrt+xcol)+1+start)));
+				if (hasBat && data.containsKey(yrow*sqrt+xcol)){
+					shower.add(new JLabel("Sequence name: "+data.get(yrow*sqrt+xcol)));
+				}
 				shower.show(e.getComponent(), x+xdif-h.x, y+ydif-h.y);
 			}
 		}
@@ -412,6 +487,9 @@ public class TotalGenerator {
 			if ((int)Math.floor(dim.height/(double)squareheight)==yrow && yrow%2==1){
 				shower.add(new JLabel("Base is "+basetobase.get(list.get((yrow*list.size()%sqrt+(list.size()%sqrt-xcol))-1))));
 				shower.add(new JLabel("Position: "+((yrow*list.size()%sqrt+(list.size()%sqrt-xcol))-1+start)));
+				if (hasBat && data.containsKey((yrow*list.size()%sqrt+(list.size()%sqrt-xcol))-1)){
+					shower.add(new JLabel("Sequence name: "+data.get((yrow*list.size()%sqrt+(list.size()%sqrt-xcol))-1)));
+				}
 				shower.add(new JLabel("Going Left"));
 				shower.show(e.getComponent(), x+xdif-h.x, y+ydif-h.y);
 			}
@@ -420,12 +498,18 @@ public class TotalGenerator {
 				if (yrow%2==1){
 					shower.add(new JLabel("Base is "+basetobase.get(list.get((yrow*sqrt+(sqrt-xcol))-1))));
 					shower.add(new JLabel("Position: "+((yrow*sqrt+(sqrt-xcol))-1+start)));
+					if (hasBat && data.containsKey((yrow*sqrt+(sqrt-xcol))-1+start)){
+						shower.add(new JLabel("Sequence name: "+data.get((yrow*sqrt+(sqrt-xcol))-1+start)));
+					}
 					shower.add(new JLabel("Going left"));
 					shower.show(e.getComponent(), x+xdif-h.x, y+ydif-h.y);
 				}
 				else{
 					shower.add(new JLabel("Base is "+basetobase.get(list.get(yrow*sqrt+xcol))));
 					shower.add(new JLabel("Position: "+(yrow*sqrt+xcol+start)));
+					if (hasBat && data.containsKey(yrow*sqrt+xcol+start)){
+						shower.add(new JLabel("Sequence name: "+data.get(yrow*sqrt+xcol+start)));
+					}
 					shower.add(new JLabel("Going right"));
 					shower.show(e.getComponent(), x+xdif-h.x, y+ydif-h.y);
 				}

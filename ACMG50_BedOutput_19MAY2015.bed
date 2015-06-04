@@ -1,0 +1,20 @@
+track name="Uniprot Annotations GU" description="UniprotAnnotations GU"
+chr3	3199	3202	Modified_residue_Phosphoserine;evidence=ECO:0000269|PubMed:23092124 0 -
+chr3	3193	3196	Modified_residue_Phosphothreonine;evidence=ECO:0000269|PubMed:23092124 0 -
+chr3	4875	4878	Modified_residue_Phosphoserine;evidence=ECO:0000269|PubMed:23092124 0 -
+chr3	4866	4869	Modified_residue_Phosphoserine;evidence=ECO:0000269|PubMed:23092124 0 -
+chr3	4797	4800	Modified_residue_Phosphoserine;evidence=ECO:0000269|PubMed:23092124 0 -
+chr3	4794	4797	Modified_residue_Phosphoserine;evidence=ECO:0000269|PubMed:23092124 0 -
+chr3	4755	4758	Modified_residue_Phosphoserine;evidence=ECO:0000269|PubMed:23092124 0 -
+chr3	4071	4074	Modified_residue_Phosphoserine;evidence=ECO:0000269|PubMed:23092124 0 -
+chr3	4062	4065	Modified_residue_Dimethylated_arginine;_alternate;evidence=ECO:0000269|PubMed:21726068 0 -
+chr3	4062	4065	Modified_residue_Omega-N-methylarginine;_alternate;evidence=ECO:0000269|PubMed:21726068 0 -
+chr3	4023	4026	Modified_residue_Dimethylated_arginine;_alternate;evidence=ECO:0000269|PubMed:21726068 0 -
+chr3	4023	4026	Modified_residue_Omega-N-methylarginine;_alternate;evidence=ECO:0000269|PubMed:21726068 0 -
+chr3	6888	3891	Modified_residue_Phosphoserine;evidence=ECO:0000269|PubMed:23092124 0 -
+chr3	8948	8951	Modified_residue_Phosphoserine;evidence=ECO:0000269|PubMed:23092124 0 -
+chr3	8939	8942	Modified_residue_Phosphoserine;evidence=ECO:0000269|PubMed:23092124 0 -
+chr3	7950	7953	Modified_residue_Dimethylated_arginine;_alternate;evidence=ECO:0000269|PubMed:21726068 0 -
+chr3	7950	7953	Modified_residue_Omega-N-methylarginine;_alternate;evidence=ECO:0000269|PubMed:21726068 0 -
+chr3	5688	5691	Modified_residue_Phosphoserine;_by_PKC;evidence=ECO:0000250 0 -
+

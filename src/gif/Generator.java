@@ -83,6 +83,9 @@ public class Generator implements ActionListener {
 	JTextField endIndex;
 	int start;
 	int end;
+	boolean bedYes = false;
+	File bed;
+	JTextField chrm;
 	
 	static HashMap<Character, Color> colorstat= new HashMap<Character, Color>();
     static {
@@ -769,8 +772,9 @@ public class Generator implements ActionListener {
 		panel.add(colorz, c);
 		c.gridy=15;
 		JButton bed = new JButton("Select a bed file to use (Optional)");
-		make.setActionCommand("horiz");
-		make.addActionListener(this);
+		bed.setActionCommand("bed");
+		bed.addActionListener(this);
+		panel.add(bed, c);
 		panel.pack();
 		panel.setVisible(true);
 	}
@@ -870,6 +874,12 @@ public class Generator implements ActionListener {
 		if (e.getActionCommand().equals("colors")){
 			pickColors();
 		}
+		else if (e.getActionCommand().equals("bed")){
+			getBed();
+		}
+		else if (e.getActionCommand().equals("bed2")){
+			frame.dispose();
+		}
 		else if (e.getActionCommand().equals("uncompress")){
 			uncompressed=true;
 		}
@@ -917,7 +927,10 @@ public class Generator implements ActionListener {
 			vert=-1;
 			panel.dispose();
 			if (uncompressed){
-				new TotalGenerator(saveloc, fileprefix, dimensions(a)).readList(a, -1, start, end);
+				TotalGenerator h = new TotalGenerator(saveloc, fileprefix, dimensions(a));
+				if (bedYes)
+					h.readData(bed, chrm.getText());
+				h.readList(a, -1, start, end);
 			}
 			else{
 				dimensions(a);
@@ -932,7 +945,10 @@ public class Generator implements ActionListener {
 			vert=0;
 			panel.dispose();
 			if (uncompressed){
-				new TotalGenerator(saveloc, fileprefix, dimensions(a)).readList(a, 1, start, end);
+				TotalGenerator h = new TotalGenerator(saveloc, fileprefix, dimensions(a));
+				if (bedYes)
+					h.readData(bed, chrm.getText());
+				h.readList(a, 1, start, end);
 			}
 			else{
 				dimensions(a);
@@ -944,6 +960,46 @@ public class Generator implements ActionListener {
 			
 		}
 		
+	}
+	public void getBed(){
+		frame = new JFrame();
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		JFileChooser fc = new JFileChooser(new File("C:\\Users\\"+System.getProperty("user.name")+"\\Downloads"));
+	    FileNameExtensionFilter filter = new FileNameExtensionFilter(
+	            "txt", "bed");
+	    fc.setFileFilter(filter);
+	    int returnVal = fc.showOpenDialog(frame);
+	    File f;
+	    if (fc.getSelectedFile()==null){
+	    	return;
+	    }
+	    if(returnVal == JFileChooser.APPROVE_OPTION){
+	    	frame.dispose();
+	    	f=fc.getSelectedFile();
+	    	frame = new JFrame();
+	    	frame.setLayout(new GridBagLayout());
+	    	GridBagConstraints c = new GridBagConstraints();
+	    	c.gridx = 0;
+	    	c.gridy = 0;
+			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			bed = f;
+			
+			frame.add(new JLabel("Name of chromosome you are examining"), c);
+			chrm = new JTextField(10);
+			c.gridy++;
+			frame.add(chrm, c);
+			JButton returner = new JButton("Submit");
+			returner.setActionCommand("bed2");
+			returner.addActionListener(this);
+			c.gridy++;
+			frame.add(returner, c);
+			bedYes = true;
+	    }
+	    else{
+	    	return;
+	    }
+		frame.setSize(600, 300);
+		frame.setVisible(true);
 	}
 	public int[] dimensions(File f){
 		try{

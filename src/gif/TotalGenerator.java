@@ -89,13 +89,17 @@ public class TotalGenerator {
 				if (line == null)
 					t = false;
 				else if (line.contains(s)){
-					String[] split = s.split("\t");
+					String[] split = line.split("\t");
 					start = Integer.parseInt(split[1]);
 					end = Integer.parseInt(split[2]);
 					contains = split[3].split("\u0020")[0];
 					for (int i = start; i<end; i++){
-						data.put(i, contains);
+						String z = data.put(i, contains);
+						if (z != null){
+							data.put(i, data.get(i)+"\n"+z);
+						}
 					}
+					System.out.println("start: "+start+" end: "+end+" contains: "+contains);
 				}
 			}
 			cin.close();
@@ -213,18 +217,14 @@ public class TotalGenerator {
 		}
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		if (end > 0){
-			System.out.println(list.size());
+			//System.out.println(list.size());
 			list = new ArrayList<Character>(list.subList(0, end-start+1));
 		}
 		list.trimToSize();
-		System.out.println("ListSize: "+list.size());
-		for (Character ca : list){
-			System.out.println(ca);
-		}
+		//System.out.println("ListSize: "+list.size());
 		width = screenSize.getWidth();
 		height = screenSize.getHeight();
 		numchars=list.size();
-		System.out.println("End 1");
 		if (q==1){
 			makeImage();
 		}

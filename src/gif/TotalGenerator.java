@@ -259,7 +259,7 @@ public class TotalGenerator {
 					c= colors.get(list.get(listindex));
 					k++;
 					if (hasBat && data.containsKey(listindex)){
-						for (int p=0; p<5;p++){
+						for (int p=0; p<7;p++){
 							c=c.brighter();
 						}
 					}
@@ -278,7 +278,7 @@ public class TotalGenerator {
 					c= colors.get(list.get(listindex));
 					k++;
 					if (hasBat && data.containsKey(listindex)){
-						for (int p=0; p<5;p++){
+						for (int p=0; p<7;p++){
 							c=c.brighter();
 						}
 					}
@@ -323,6 +323,7 @@ public class TotalGenerator {
 		int k=0;
 		int listindex=0;
 		int lastindex=list.size()-1;
+		System.out.println(list.size());
 		if (list.size() < sqrt){
 			image = new BufferedImage(list.size()*squarewidth, (int)(squareheight), BufferedImage.TYPE_INT_RGB);
 		}
@@ -341,7 +342,7 @@ public class TotalGenerator {
 					c= colors.get(list.get(listindex));
 					k++;
 					if (hasBat && data.containsKey(listindex)){
-						for (int p=0; p<5;p++){
+						for (int p=0; p<7;p++){
 							c=c.brighter();
 						}
 					}
@@ -362,7 +363,7 @@ public class TotalGenerator {
 					c= colors.get(list.get(listindex));
 					k++;
 					if (hasBat && data.containsKey(listindex)){
-						for (int p=0; p<5;p++){
+						for (int p=0; p<7;p++){
 							c=c.brighter();
 						}
 					}
@@ -383,7 +384,7 @@ public class TotalGenerator {
 				//System.out.println(list.get((i*20)+n).getCharacter());
 				//System.out.println(c);
 				if (hasBat && data.containsKey(listindex)){
-					for (int p=0; p<5;p++){
+					for (int p=0; p<7;p++){
 						c=c.brighter();
 					}
 				}
@@ -405,7 +406,7 @@ public class TotalGenerator {
 					//System.out.println(list.get((i*20)+n).getCharacter());
 					//System.out.println(c);
 					if (hasBat && data.containsKey(listindex)){
-						for (int p=0; p<5;p++){
+						for (int p=0; p<7;p++){
 							c=c.brighter();
 						}
 					}

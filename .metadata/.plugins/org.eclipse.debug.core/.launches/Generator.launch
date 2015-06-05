@@ -8,4 +8,5 @@
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="gif.Generator"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="GenomeVisualizer"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx4096m"/>
 </launchConfiguration>

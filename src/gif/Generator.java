@@ -2,6 +2,7 @@ package gif;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -34,6 +36,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
+import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.JViewport;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -86,6 +89,8 @@ public class Generator implements ActionListener {
 	boolean bedYes = false;
 	File bed;
 	JTextField chrm;
+	JSlider slider;
+	int bedScale;
 	
 	static HashMap<Character, Color> colorstat= new HashMap<Character, Color>();
     static {
@@ -99,9 +104,10 @@ public class Generator implements ActionListener {
       * //Spiral pattern 
       * //DONE-----control size of squares 
       * //DONE-----print number of letters shown 
-      * //DONE-----Clickable image //DONE-----Snake 
+      * //DONE-----Clickable image 
+      * //DONE-----Snake 
       * //Differences 
-      * //Customizable Colors- Still need to do in pair and total 
+      * //DONE-----Customizable Colors- Still need to do in pair and total 
       * //DONE-----Finish pair parsing- something weird at the end 
       * //DONE-----Index on click menu 
       * //DONE-----Fix base numbers 
@@ -878,6 +884,7 @@ public class Generator implements ActionListener {
 			getBed();
 		}
 		else if (e.getActionCommand().equals("bed2")){
+			bedScale = slider.getValue();
 			frame.dispose();
 		}
 		else if (e.getActionCommand().equals("uncompress")){
@@ -929,7 +936,7 @@ public class Generator implements ActionListener {
 			if (uncompressed){
 				TotalGenerator h = new TotalGenerator(saveloc, fileprefix, dimensions(a));
 				if (bedYes)
-					h.readData(bed, chrm.getText());
+					h.readData(bed, chrm.getText(), bedScale);
 				h.readList(a, -1, start, end);
 			}
 			else{
@@ -947,7 +954,7 @@ public class Generator implements ActionListener {
 			if (uncompressed){
 				TotalGenerator h = new TotalGenerator(saveloc, fileprefix, dimensions(a));
 				if (bedYes)
-					h.readData(bed, chrm.getText());
+					h.readData(bed, chrm.getText(), bedScale);
 				h.readList(a, 1, start, end);
 			}
 			else{
@@ -978,6 +985,20 @@ public class Generator implements ActionListener {
 	    	f=fc.getSelectedFile();
 	    	frame = new JFrame();
 	    	frame.setLayout(new GridBagLayout());
+	        JLabel sliderLabel = new JLabel("Visibility of features", JLabel.CENTER);
+	        sliderLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+	        //Create the slider.
+	        slider = new JSlider(JSlider.HORIZONTAL,
+	                                              0, 5, 1);
+	        //Turn on labels at major tick marks.
+	        slider.setMajorTickSpacing(5);
+	        slider.setMinorTickSpacing(1);
+	        slider.setPaintTicks(true);
+	        slider.setPaintLabels(true);
+	        slider.setBorder(
+	                BorderFactory.createEmptyBorder(0,0,10,0));
+
 	    	GridBagConstraints c = new GridBagConstraints();
 	    	c.gridx = 0;
 	    	c.gridy = 0;
@@ -988,6 +1009,10 @@ public class Generator implements ActionListener {
 			chrm = new JTextField(10);
 			c.gridy++;
 			frame.add(chrm, c);
+			c.gridy++;
+			frame.add(sliderLabel, c);
+			c.gridy++;
+			frame.add(slider, c);
 			JButton returner = new JButton("Submit");
 			returner.setActionCommand("bed2");
 			returner.addActionListener(this);

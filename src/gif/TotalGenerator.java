@@ -57,6 +57,7 @@ public class TotalGenerator {
 	int start;
 	int end;
 	HashMap<Integer, String> data = null;
+	int bedScale;
 	
 	public TotalGenerator(File save, String pre, int[] dim) {
 		fileprefix = pre;
@@ -75,8 +76,9 @@ public class TotalGenerator {
 		sqrt = dim[2];
 		saver=save;
 	}
-	public void readData(File f, String s){
+	public void readData(File f, String s, int bs){
 		try{
+			bedScale = bs;
 			FileReader countz = new FileReader(f);
 			BufferedReader cin = new BufferedReader(countz);
 			data = new HashMap<Integer, String>();
@@ -96,7 +98,7 @@ public class TotalGenerator {
 					for (int i = start; i<end; i++){
 						String z = data.put(i, contains);
 						if (z != null){
-							data.put(i, data.get(i)+"\n"+z);
+							data.put(i, data.get(i)+"<br>"+z);
 						}
 					}
 					System.out.println("start: "+start+" end: "+end+" contains: "+contains);
@@ -259,8 +261,13 @@ public class TotalGenerator {
 					c= colors.get(list.get(listindex));
 					k++;
 					if (hasBat && data.containsKey(listindex)){
-						for (int p=0; p<7;p++){
+						for (int p=0; p<bedScale;p++){
 							c=c.brighter();
+						}
+					}
+					else if (hasBat){
+						for (int p=0; p<bedScale;p++){
+							c=c.darker();
 						}
 					}
 					g.setColor(c);
@@ -278,8 +285,13 @@ public class TotalGenerator {
 					c= colors.get(list.get(listindex));
 					k++;
 					if (hasBat && data.containsKey(listindex)){
-						for (int p=0; p<7;p++){
+						for (int p=0; p<bedScale;p++){
 							c=c.brighter();
+						}
+					}
+					else if (hasBat){
+						for (int p=0; p<bedScale;p++){
+							c=c.darker();
 						}
 					}
 					g.setColor(c);
@@ -342,8 +354,13 @@ public class TotalGenerator {
 					c= colors.get(list.get(listindex));
 					k++;
 					if (hasBat && data.containsKey(listindex)){
-						for (int p=0; p<7;p++){
+						for (int p=0; p<bedScale;p++){
 							c=c.brighter();
+						}
+					}
+					else if (hasBat){
+						for (int p=0; p<bedScale;p++){
+							c=c.darker();
 						}
 					}
 					//System.out.println(c);
@@ -363,8 +380,13 @@ public class TotalGenerator {
 					c= colors.get(list.get(listindex));
 					k++;
 					if (hasBat && data.containsKey(listindex)){
-						for (int p=0; p<7;p++){
+						for (int p=0; p<bedScale;p++){
 							c=c.brighter();
+						}
+					}
+					else if (hasBat){
+						for (int p=0; p<bedScale;p++){
+							c=c.darker();
 						}
 					}
 					g.setColor(c);
@@ -384,8 +406,13 @@ public class TotalGenerator {
 				//System.out.println(list.get((i*20)+n).getCharacter());
 				//System.out.println(c);
 				if (hasBat && data.containsKey(listindex)){
-					for (int p=0; p<7;p++){
+					for (int p=0; p<bedScale;p++){
 						c=c.brighter();
+					}
+				}
+				else if (hasBat){
+					for (int p=0; p<bedScale;p++){
+						c=c.darker();
 					}
 				}
 				g.setColor(c);
@@ -406,8 +433,13 @@ public class TotalGenerator {
 					//System.out.println(list.get((i*20)+n).getCharacter());
 					//System.out.println(c);
 					if (hasBat && data.containsKey(listindex)){
-						for (int p=0; p<7;p++){
+						for (int p=0; p<bedScale;p++){
 							c=c.brighter();
+						}
+					}
+					else if (hasBat){
+						for (int p=0; p<bedScale;p++){
+							c=c.darker();
 						}
 					}
 					g.setColor(c);
@@ -455,10 +487,10 @@ public class TotalGenerator {
 		if (ydif<0){
 			ydif=0;
 		}
-		System.out.println(xdif+" dif: "+ydif);
         Point h=viewport.getViewPosition();        
         xdif+=(zPanel.panel.scale*squarewidth)/5;
         ydif+=(zPanel.panel.scale*squareheight+4)/5;
+		System.out.println(xdif+" dif: "+ydif);
         //h is how much the user has scrolled, corrects for that.
         System.out.println(e.getX()+", real "+e.getY());
 		int x=e.getX()+h.x-xdif;
@@ -477,7 +509,7 @@ public class TotalGenerator {
 				shower.add(new JLabel("Base is "+basetobase.get(list.get(yrow*sqrt+xcol))));
 				shower.add(new JLabel("Position: "+((yrow*sqrt+xcol)+1+start)));
 				if (hasBat && data.containsKey(yrow*sqrt+xcol)){
-					shower.add(new JLabel("Sequence name: "+data.get(yrow*sqrt+xcol)));
+					shower.add(new JLabel("<html>Feature: "+data.get(yrow*sqrt+xcol)+"</html>"));
 				}
 				shower.show(e.getComponent(), x+xdif-h.x, y+ydif-h.y);
 			}
@@ -489,7 +521,7 @@ public class TotalGenerator {
 				shower.add(new JLabel("Base is "+basetobase.get(list.get((yrow*list.size()%sqrt+(list.size()%sqrt-xcol))-1))));
 				shower.add(new JLabel("Position: "+((yrow*list.size()%sqrt+(list.size()%sqrt-xcol))-1+start)));
 				if (hasBat && data.containsKey((yrow*list.size()%sqrt+(list.size()%sqrt-xcol))-1)){
-					shower.add(new JLabel("Sequence name: "+data.get((yrow*list.size()%sqrt+(list.size()%sqrt-xcol))-1)));
+					shower.add(new JLabel("<html>Feature: "+data.get((yrow*list.size()%sqrt+(list.size()%sqrt-xcol))-1)+"</html>"));
 				}
 				shower.add(new JLabel("Going Left"));
 				shower.show(e.getComponent(), x+xdif-h.x, y+ydif-h.y);
@@ -500,7 +532,7 @@ public class TotalGenerator {
 					shower.add(new JLabel("Base is "+basetobase.get(list.get((yrow*sqrt+(sqrt-xcol))-1))));
 					shower.add(new JLabel("Position: "+((yrow*sqrt+(sqrt-xcol))-1+start)));
 					if (hasBat && data.containsKey((yrow*sqrt+(sqrt-xcol))-1+start)){
-						shower.add(new JLabel("Sequence name: "+data.get((yrow*sqrt+(sqrt-xcol))-1+start)));
+						shower.add(new JLabel("<html>Feature: "+data.get((yrow*sqrt+(sqrt-xcol))-1+start)+"</html>"));
 					}
 					shower.add(new JLabel("Going left"));
 					shower.show(e.getComponent(), x+xdif-h.x, y+ydif-h.y);
@@ -509,7 +541,7 @@ public class TotalGenerator {
 					shower.add(new JLabel("Base is "+basetobase.get(list.get(yrow*sqrt+xcol))));
 					shower.add(new JLabel("Position: "+(yrow*sqrt+xcol+start)));
 					if (hasBat && data.containsKey(yrow*sqrt+xcol+start)){
-						shower.add(new JLabel("Sequence name: "+data.get(yrow*sqrt+xcol+start)));
+						shower.add(new JLabel("<html>Feature: "+data.get(yrow*sqrt+xcol+start)+"</html>"));
 					}
 					shower.add(new JLabel("Going right"));
 					shower.show(e.getComponent(), x+xdif-h.x, y+ydif-h.y);
